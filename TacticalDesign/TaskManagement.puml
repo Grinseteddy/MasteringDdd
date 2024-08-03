@@ -1,0 +1,74 @@
+@startuml
+'https://plantuml.com/class-diagram
+
+hide empty members
+skinparam linetype ortho
+
+skinparam class {
+    backgroundcolor #FFFFFF
+    backgroundcolor<<Aggregate>> #CCCCCC
+    backgroundcolor<<Entity>> #DDDDDD
+    backgroundcolor<<Value Object>> #EEEEEE
+
+    bordercolor grey
+    fontcolor grey
+    fontcolor<<Aggregate>> grey
+    fontcolor<<Entity>> grey
+    fontcolor<<Value Object>> grey
+
+    attributefontcolor grey
+    attributefontsize 12
+    attributefontcolor<<Aggregate>> grey
+
+    stereotypefontcolor grey
+    stereotypefontsize 8
+
+
+}
+
+skinparam arrow {
+    color grey
+    fontcolor grey
+    fontsize 10
+}
+
+class "Task"  as task <<(A,#FFFFFF) Aggregate>> {
+    * id: uuid
+    * dueDate: date
+    * creationDate: date
+    description: Text
+    * title: string
+    * assignee : LeanUser
+    requester: LeanUser
+    * status: Status
+}
+
+class "LeanUser" as leanUser <<(E,#FFFFFF) Entity>> {
+    * id: uuid
+    * name: string
+    * surname: string
+}
+
+enum "Status" as status <<(E, #FFFFFF)>> {
+    NEW
+    ASSIGNED
+    IN_PROGRESS
+    REJECTED
+    DONE
+}
+
+class "Text" as text <<V,#FFFFFF) Value Object>> {
+    *text: string
+    changeDate: date
+    *hashValue: string
+}
+
+task o-- leanUser
+task *-- text
+task *-- status
+
+'layoust
+text *-[hidden]- status
+leanUser *-[hidden]- status
+
+@enduml

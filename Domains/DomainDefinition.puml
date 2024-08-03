@@ -1,0 +1,36 @@
+@startuml
+
+skinparam class {
+    bordercolor black
+    arrowcolor black
+    arrowfontsize 10
+    stereotypefontcolor black
+    stereotypefontsize 10
+
+    fontcolor black
+
+}
+class "Enterprise" as enterprise <<Domain>>
+
+class "Core Domain" as coreDomain <<Subdomain>>
+
+class "Generic Domain" as genericDomain <<Subdomain>>
+
+class "Supportive Domain" as supportiveDomain <<Subdomain>>
+
+class "Business Knowledge" as businessTask
+
+class "Generic Knowledge" as genericTask
+
+
+enterprise *--"1..*" coreDomain
+enterprise *--"1..*" supportiveDomain
+enterprise *--"1..*" genericDomain
+
+coreDomain --> businessTask : uses
+genericDomain --> genericTask : uses
+supportiveDomain --> businessTask : uses
+supportiveDomain --> genericTask : uses
+
+
+@enduml

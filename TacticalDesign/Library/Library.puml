@@ -49,7 +49,7 @@ skinparam note {
 
 }
 
-storage "Catalog" as catalogBoundedContext  {
+storage "Catalog Management" as catalogBoundedContext  {
     class "Catalog" as catalog <<(A,#FFFFFF) Aggregate>> {
         id: uuid
         catalogEntries: array of CatalogEntry
@@ -170,5 +170,6 @@ individualNote ..> bookRead : use
 bookRead ..> lendingEntry : use
 lendingEntry ..> catalogEntry : use
 lendingEntry ..> catalog : use
+lendingEntry ..> bookShelf : use
 
 @enduml

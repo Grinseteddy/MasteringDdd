@@ -2,6 +2,7 @@
 'https://plantuml.com/state-diagram
 
 'skinparam linetype ortho
+'skinparam linetype polyline
 allowmixing
 
 skinparam state {
@@ -25,43 +26,62 @@ skinparam rectangle {
 
 rectangle Purchase {
     state "PURCHASED" as purchased
+    purchased : Book
 }
 
 rectangle "Catalog Management" as catalogManagement {
     state "CREATED" as entryCreated
+    state "PENDING" as pending
+    pending : Catalog
+    entryCreated : CatalogEntry
     state "STORED" as entryStored
+    entryStored : CatalogEntry
     state "PUBLISHED" as entryPublished
+    entryPublished : CatalogEntry
+
+    state "UPDATED" as updated
+    updated : Catalog
 }
 
 rectangle "Lending"{
     state "LENT" as lent
+    lent : LendingEntry
     state "RETURNED" as returned
+    returned : LendingEntry
 }
 
 rectangle "Reading" {
     state "NOT_STARTED" as notStarted
+    notStarted : BookRead
     state "READ" as read
+    read : BookRead
     state "FINISHED" as finished
+    finished : BookRead
 }
 
 rectangle "Notes" {
     state "CREATED" as notesCreated
+    notesCreated : IndividualNote
     state "DELETED" as notesDeleted
+    notesDeleted : IndividualNote
 }
 
 purchased -down-> entryCreated : Create catalog\nentry
 entryCreated -down-> entryStored : Store entry
+entryCreated -> pending : Store entry
 entryStored -down-> entryPublished : Update catalog
+
+pending -down-> updated : Update catalog
 entryPublished -down-> lent : Lend book
-lent -down-> notStarted : Lend book
-notStarted -down-> read
+lent -> notStarted : Lend book
+notStarted -down-> read : Start reading\nbook
 read --> notesCreated : Create note
-read -down-> finished
+read -down-> finished : Finish book
 finished -> returned : Return book
-notStarted ->returned : Return book
+notStarted -left->returned : Return book
 notesCreated --> notesDeleted : Delete note
 read -right-> returned : Return book
-
+lent -down-> returned
 
 
 

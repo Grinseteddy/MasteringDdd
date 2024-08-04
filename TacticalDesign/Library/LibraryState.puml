@@ -1,0 +1,68 @@
+@startuml
+'https://plantuml.com/state-diagram
+
+'skinparam linetype ortho
+allowmixing
+
+skinparam state {
+    backgroundcolor #E5e5e5
+
+    fontcolor grey
+}
+
+skinparam arrow {
+    fontcolor grey
+    fontsize 8
+    color grey
+}
+
+skinparam rectangle {
+    backgroundcolor white
+    bordercolor grey
+    borderstyle dashed
+    fontcolor grey
+}
+
+rectangle Purchase {
+    state "PURCHASED" as purchased
+}
+
+rectangle "Catalog Management" as catalogManagement {
+    state "CREATED" as entryCreated
+    state "STORED" as entryStored
+    state "PUBLISHED" as entryPublished
+}
+
+rectangle "Lending"{
+    state "LENT" as lent
+    state "RETURNED" as returned
+}
+
+rectangle "Reading" {
+    state "NOT_STARTED" as notStarted
+    state "READ" as read
+    state "FINISHED" as finished
+}
+
+rectangle "Notes" {
+    state "CREATED" as notesCreated
+    state "DELETED" as notesDeleted
+}
+
+purchased -down-> entryCreated : Create catalog\nentry
+entryCreated -down-> entryStored : Store entry
+entryStored -down-> entryPublished : Update catalog
+entryPublished -down-> lent : Lend book
+lent -down-> notStarted : Lend book
+notStarted -down-> read
+read --> notesCreated : Create note
+read -down-> finished
+finished -> returned : Return book
+notStarted ->returned : Return book
+notesCreated --> notesDeleted : Delete note
+read -right-> returned : Return book
+
+
+
+
+@enduml

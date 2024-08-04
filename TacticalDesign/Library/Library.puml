@@ -1,6 +1,174 @@
 @startuml
 'https://plantuml.com/class-diagram
 
+hide empty members
+skinparam linetype polyline
+allowmixing
 
+skinparam class {
+    backgroundcolor #FFFFFF
+    backgroundcolor<<Aggregate>> #CCCCCC
+    backgroundcolor<<Entity>> #DDDDDD
+    backgroundcolor<<Value Object>> #EEEEEE
+
+    bordercolor grey
+    fontcolor grey
+    fontcolor<<Aggregate>> grey
+    fontcolor<<Entity>> grey
+    fontcolor<<Value Object>> grey
+
+    attributefontcolor grey
+    attributefontsize 12
+    attributefontcolor<<Aggregate>> grey
+
+    stereotypefontcolor grey
+    stereotypefontsize 8
+
+
+}
+
+skinparam arrow {
+    color grey
+    fontcolor grey
+    fontsize 10
+}
+
+skinparam storage {
+    backgroundcolor white
+    bordercolor grey
+    borderstyle dashed
+    fontcolor grey
+}
+
+skinparam note {
+    backgroundcolor white
+    fontcolor grey
+    fontstyle italic
+    fontsize 10
+    bordercolor grey
+
+}
+
+storage "Catalog" as catalogBoundedContext  {
+    class "Catalog" as catalog <<(A,#FFFFFF) Aggregate>> {
+        id: uuid
+        catalogEntries: array of CatalogEntry
+        + search(SearchCriteria: searchCriteria)
+        + update(CatalogEntry: newEntry)
+    }
+
+    class "CatalogEntry" as catalogEntry <<A, #FFFFFF>> {
+        * id: uuid
+        * title : string
+        * authors : array of string
+        blurb: string
+        thumbnail: image
+        * editor: Editor
+        * year: string
+        * status: Status
+    }
+
+    class "Editor" as editor <<(V, #FFFFFF) Value Object>> {
+        * name: string
+        * city: string
+        country: string
+        address: Address
+    }
+
+    class "Address" as address <<V, #FFFFFF) Value Object>> {
+        * street: string
+        * city: string
+        * postCode: string
+    }
+
+    enum "Status" as statusCatalogEntry <<(N,#FFFFFF)>> {
+        CREATED
+        STORED
+        PUBLISHED
+    }
+
+    catalog *-"1..*" catalogEntry
+    catalogEntry *-"1" editor
+    editor *-"0..1" address
+    catalogEntry *--"1" statusCatalogEntry
+}
+
+storage Notes {
+    class "IndividualNote" as individualNote <<(A, #FFFFFF) Aggregate>> {
+        * id: uuid
+        note: string
+        text: Position
+        * book: uuid
+        * status: Status
+        + create(Position position)
+    }
+
+    class "Position" as position <<(V, #FFFFFF) Value Object>> {
+        * start: unsignedInteger
+        * end: unsignedInteger
+    }
+
+    enum "Status" as statusNote <<(N, FFFFFF)>> {
+        CREATED
+        DELETED
+    }
+
+    individualNote *-down- position
+    individualNote *-"1" statusNote
+
+}
+
+storage Reading {
+    class "BookRead" as bookRead <<(A, #FFFFFF) Aggregate>> {
+        *id: uuid
+        *lendingEntry: uuid
+        *title: string
+        *authors: array of string
+        readingPosition: array of unsignedInteger
+        * status: Status
+    }
+
+    class "BookShelf" as bookShelf <<(A, #FFFFFF) Aggregate>> {
+        * id: uuid
+        * owner: uuid
+    }
+
+    note right  {
+        Reader of book is
+        the owner of
+        the bookshelf.
+    }
+
+    enum "Status" as statusBookRead <<(N, #FFFFFF)>> {
+        NOT_STARTED
+        READ
+        FINISHED
+    }
+
+    bookShelf *--"0..*" bookRead
+    bookRead *--"1" statusBookRead
+
+}
+
+storage Lending {
+    class "LendingEntry" as lendingEntry <<(A, #FFFFFF) Aggregate>>{
+        * bookLent: uuid
+        * member: uuid
+        + lendBook(book: uuid, member: uuid)
+        + returnBook(catalogEntry: uuid, catalog: uuid, member: uuid)
+    }
+
+    enum "Status" as statusLending <<(N, #FFFFFF)>> {
+        LENT
+        RETURNED
+    }
+
+    lendingEntry *-"1" statusLending
+}
+
+individualNote ..> bookRead : use
+bookRead ..> lendingEntry : use
+lendingEntry ..> catalogEntry : use
+lendingEntry ..> catalog : use
 
 @enduml

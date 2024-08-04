@@ -49,7 +49,7 @@ class "LeanUser" as leanUser <<(E,#FFFFFF) Entity>> {
     * surname: string
 }
 
-enum "Status" as status <<(E, #FFFFFF)>> {
+enum "Status" as status <<(N, #FFFFFF)>> {
     NEW
     ASSIGNED
     IN_PROGRESS

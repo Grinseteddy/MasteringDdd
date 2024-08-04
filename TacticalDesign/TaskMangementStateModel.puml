@@ -1,0 +1,31 @@
+@startuml
+'https://plantuml.com/state-diagram
+
+skinparam linetype ortho
+
+skinparam state {
+    backgroundcolor #E5e5e5
+
+    fontcolor grey
+}
+
+skinparam arrow {
+    fontcolor grey
+    fontsize 8
+    color grey
+}
+
+scale 350 width
+[*] --> NEW : Create task
+
+NEW --> ASSIGNED : Assign task
+
+ASSIGNED --> IN_PROGRESS : Work on task
+ASSIGNED --> REJECTED : Work on task
+
+IN_PROGRESS --> DONE : Finish task
+
+
+
+
+@enduml

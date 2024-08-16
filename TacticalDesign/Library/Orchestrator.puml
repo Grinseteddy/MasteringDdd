@@ -60,12 +60,11 @@ member --> clientUi : Select book
 clientUi --> clientOrchestrator : Book selected
 clientOrchestrator --> lending : Lend book
 clientOrchestrator --> reading : Put book on bookShelf
+clientOrchestrator --> clientOrchestrator: close process
 end group
 group Reading
 clientOrchestrator --> reading : Start reading
-clientOrchestrator --> clientOrchestrator: close process
 clientOrchestrator --> clientOrchestrator: create process ID reading
-
 clientOrchestrator --> clientUi : Reading started
 clientUi --> clientUi : Show open book
 member --> clientUi : Read book

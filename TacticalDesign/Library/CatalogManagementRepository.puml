@@ -1,6 +1,100 @@
 @startuml
 'https://plantuml.com/class-diagram
 
+hide empty members
+skinparam linetype polyline
+allowmixing
+'!pragma layout smetana
 
+skinparam class {
+    backgroundcolor #FFFFFF
+    backgroundcolor<<Aggregate>> #CCCCCC
+    backgroundcolor<<Entity>> #DDDDDD
+    backgroundcolor<<Value Object>> #EEEEEE
+
+    bordercolor grey
+    fontcolor grey
+    fontcolor<<Aggregate>> grey
+    fontcolor<<Entity>> grey
+    fontcolor<<Value Object>> grey
+
+    attributefontcolor grey
+    attributefontsize 12
+    attributefontcolor<<Aggregate>> grey
+
+    stereotypefontcolor grey
+    stereotypefontsize 8
+
+
+}
+
+skinparam arrow {
+    color grey
+    fontcolor grey
+    fontsize 10
+}
+
+skinparam storage {
+    backgroundcolor white
+    bordercolor grey
+    borderstyle dashed
+    fontcolor grey
+
+}
+
+skinparam note {
+    backgroundcolor white
+    fontcolor grey
+    fontstyle italic
+    fontsize 10
+    bordercolor grey
+
+}
+
+<style>
+port {
+  LineColor grey
+  BackgroundColor #BBBBBB
+  fontcolor grey
+  fontsize 12
+  fontstyle italic
+}
+</style>
+
+skinparam database {
+    backgroundcolor #DDDDDD
+    bordercolor grey
+    fontcolor grey
+    fontsize 12
+}
+
+storage "Catalog Management" as catalogBoundedContext  {
+
+
+    portIn "Catalog\nEntry Search" as portCatalogEntrySearchService
+    portIn "Catalog\nUpdate" as portCatalogUpdateService
+
+
+
+    storage "CatalogManagement Repository" {
+
+        portIn "Catalog\nEntry Search" as portSearch
+        portIn "Catalog\n Update" as portUpdate
+
+        database "Catalog\nManagement\nDatabase" as repoCatalogManagement {
+
+        }
+    }
+}
+
+
+
+storage "Client" as client
+
+client --> portCatalogEntrySearchService : search
+client --> portCatalogUpdateService : update
+
+portCatalogEntrySearchService --> portSearch
+portCatalogUpdateService --> portUpdate
 
 @enduml

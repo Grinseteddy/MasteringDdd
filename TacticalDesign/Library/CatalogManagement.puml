@@ -1,0 +1,90 @@
+@startuml
+'https://plantuml.com/class-diagram
+
+skinparam component {
+    bordercolor grey
+    fontcolor #777777
+}
+
+skinparam class {
+    backgroundcolor #FFFFFF
+    backgroundcolor<<Aggregate>> #CCCCCC
+    backgroundcolor<<Entity>> #DDDDDD
+    backgroundcolor<<Value Object>> #EEEEEE
+
+    bordercolor grey
+    fontcolor grey
+    fontcolor<<Aggregate>> grey
+    fontcolor<<Entity>> grey
+    fontcolor<<Value Object>> grey
+
+    attributefontcolor grey
+    attributefontsize 12
+    attributefontcolor<<Aggregate>> grey
+
+    stereotypefontcolor grey
+    stereotypefontsize 8
+
+
+}
+
+skinparam arrow {
+    color grey
+    fontcolor grey
+    fontsize 10
+}
+
+skinparam queue {
+    backgroundcolor #FFFFFF
+    backgroundcolor<<Aggregate>> #CCCCCC
+    backgroundcolor<<Entity>> #DDDDDD
+    backgroundcolor<<Value Object>> #EEEEEE
+
+    bordercolor grey
+    fontcolor grey
+    fontcolor<<Aggregate>> grey
+    fontcolor<<Entity>> grey
+    fontcolor<<Value Object>> grey
+
+    attributefontcolor grey
+    attributefontsize 12
+    attributefontcolor<<Aggregate>> grey
+
+    stereotypefontcolor grey
+    stereotypefontsize 8
+
+
+}
+
+
+component "Catalog Management" as catalogManagement {
+    component "Catalog Factory" as catalogFactory {
+        class "Catalog" as catalogWrite {
+            update(CatalogEntry)
+        }
+        interface "Catalog" as catalogInterface {
+            post(CatalogEntry)
+            put(CatalogEntry)
+        }
+    }
+
+    component "Catalog Query" {
+        class "Catalog" as catalogRead {
+            search(SearchCriteria)
+        }
+        interface "Catalog" as catalogReadInterface {
+            get(SearchCriteria)
+        }
+    }
+}
+
+queue "Library" as libraryQueue {
+
+}
+
+catalogInterface -right- catalogWrite
+catalogReadInterface -left- catalogRead
+
+catalogWrite --> libraryQueue : produceEvent\n(catalogEntryCreated)
+catalogRead --> libraryQueue : consumeEvent\n(catalogEntryCreated)
+@enduml

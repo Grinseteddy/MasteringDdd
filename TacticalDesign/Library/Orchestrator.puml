@@ -11,6 +11,8 @@ skinparam participant {
     backgroundcolor white
     fontcolor grey
     bordercolor grey
+
+    fontcolor<<Orchestrator>> black
 }
 
 skinparam actor {
@@ -39,7 +41,7 @@ actor "Member" as member
 
 box Client
 participant "Client UI" as clientUi
-participant "Client\nOrchestrator" as clientOrchestrator
+participant "Client\nOrchestrator" as clientOrchestrator <<Orchestrator>>
 
 box Library
 participant "Catalog Search" as catalogSearch

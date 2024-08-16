@@ -2,10 +2,83 @@
 'https://plantuml.com/sequence-diagram
 
 autonumber
+autonumber
+skinparam arrow {
+    fontcolor grey
+    color grey
+}
 
-Alice -> Bob: Authentication Request
-Bob --> Alice: Authentication Response
+skinparam participant {
+    backgroundcolor white
+    fontcolor grey
+    bordercolor grey
+}
 
-Alice -> Bob: Another authentication Request
-Alice <-- Bob: another authentication Response
+skinparam queue {
+    backgroundcolor white
+    fontcolor grey
+    bordercolor grey
+    fontcolor<<Choreography>> black
+}
+
+skinparam actor {
+    backgroundcolor grey
+    fontcolor grey
+    bordercolor grey
+}
+
+<style>
+sequenceDiagram {
+  group {
+    FontStyle italic
+    LineThickness 1
+    LineColor grey
+  }
+  groupHeader {
+    FontStyle italic
+    FontColor grey
+    BackGroundColor white
+    LineColor grey
+  }
+}
+</style>
+
+actor Member as member
+
+box Client
+    participant "Search MFE" as searchUi
+    participant "Lending MFE" as lendingUi
+    participant "Reading MFE" as readingUi
+    participant "Bookshelf MFE" as bookshelfUi
+    queue "Portal Framework" as portalQueue <<Choreography>>
+
+
+box Library
+    participant "Catalog Search" as searchComponent
+    participant "Lending" as lendingComponent
+    participant "Reading" as readingComponent
+    participant "Bookshelf" as bookshelfComponent
+
+group Search
+    member --> searchUi : Search criteria
+    searchUi --> searchComponent : Search criteria
+    searchComponent --> searchUi : Result set
+    member --> searchUi: select book
+
+    searchUi --> portalQueue : produce event\nbook selected
+    lendingUi --> portalQueue : consume event\nbook selected
+    lendingUi --> lendingComponent : lend book
+    lendingUi --> portalQueue : produce event\book lent
+end group
+
+group Reading
+    bookshelfUi --> portalQueue : consume event\nbook lent
+    readingUi --> portalQueue : consume event\nbook lent
+    bookshelfUi --> bookshelfComponent : Put book on bookshelf
+    readingUi --> readingComponent : Start reading
+    readingUi --> readingUi : Show book
+    member --> readingUi : Start reading
+end group
+
+
 @enduml

@@ -1,0 +1,77 @@
+@startuml
+'https://plantuml.com/sequence-diagram
+
+autonumber
+skinparam arrow {
+    fontcolor grey
+    color grey
+}
+
+skinparam participant {
+    backgroundcolor white
+    fontcolor grey
+    bordercolor grey
+}
+
+skinparam actor {
+    backgroundcolor grey
+    fontcolor grey
+    bordercolor grey
+}
+
+<style>
+sequenceDiagram {
+  group {
+    FontStyle italic
+    LineThickness 1
+    LineColor grey
+  }
+  groupHeader {
+    FontStyle italic
+    FontColor grey
+    BackGroundColor white
+    LineColor grey
+  }
+}
+</style>
+
+actor "Member" as member
+
+box Client
+participant "Client UI" as clientUi
+participant "Client\nOrchestrator" as clientOrchestrator
+
+box Library
+participant "Catalog Search" as catalogSearch
+participant "Lending" as lending
+participant "Reading" as reading
+
+group Search
+member --> clientUi : Search in catalogSearch
+clientUi --> clientOrchestrator : Search
+clientOrchestrator --> clientOrchestrator : create process ID searching
+clientOrchestrator --> catalogSearch : Search
+
+catalogSearch --> clientOrchestrator : Search result
+clientOrchestrator --> clientUi : Search result
+clientUi --> member : Present search result
+
+member --> clientUi : Select book
+clientUi --> clientOrchestrator : Book selected
+clientOrchestrator --> lending : Lend book
+clientOrchestrator --> reading : Put book on bookShelf
+end group
+group Reading
+clientOrchestrator --> reading : Start reading
+clientOrchestrator --> clientOrchestrator: close process
+clientOrchestrator --> clientOrchestrator: create process ID reading
+
+clientOrchestrator --> clientUi : Reading started
+clientUi --> clientUi : Show open book
+member --> clientUi : Read book
+end group
+
+
+
+
+@enduml

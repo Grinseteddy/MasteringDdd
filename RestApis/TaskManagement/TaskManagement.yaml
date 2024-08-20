@@ -20,7 +20,7 @@ tags:
   - name: Task
     description: All endpoints handling tasks
 paths:
-  /resources:
+  /tasks:
     get:
       description: Using this endpoint a user gets back all task fulfilling their search criteria
       operationId: getTasksByFilterCriteria
@@ -31,6 +31,8 @@ paths:
             - resource:read
       parameters:
         - $ref: '#/components/parameters/SearchCriteriasParameter'
+        - $ref: '#/components/parameters/AssigneeSearchParameter'
+        - $ref: '#/components/parameters/RequesterSearchParameter'
         - $ref: '#/components/parameters/VersionParameter'
       responses:
         '200':
@@ -48,7 +50,7 @@ paths:
       description: Creates a new Task
       operationId: createNewRessource
       tags:
-        - Name Tag
+        - Task
       security:
         - openIdConnect:
             - resource:write
@@ -69,13 +71,12 @@ paths:
         default:
           $ref: '#/components/responses/DefaultResponse'
 
-  /resources/{resourceIdentifier}:
+  /tasks/{taskId}:
     get:
-      description: Description # describe your function
-      # define a unique operationId
+      description: Get a task by its identifier
       operationId: getResourceById
       tags:
-        - Name Tag
+        - Task
       security:
         - openIdConnect:
             - resource:read
@@ -98,11 +99,10 @@ paths:
           $ref: '#/components/responses/DefaultResponse'
 
     put:
-      description: Description # describe your function
-      # define a unique operationId
+      description: Update a task by its identifier
       operationId: updateResourceById
       tags:
-        - Name Tag
+        - Task
       security:
         - openIdConnect:
             - resource:write
@@ -162,7 +162,7 @@ components:
           - 448b5bc-a9bc-4036-8899-c77f781a76d5
 
     SearchCriteriasParameter:
-      name: searchCriteriasTitle
+      name: title
       description: Search criteria to be used to be searched for a task
       in: query
       required: false
@@ -174,6 +174,41 @@ components:
           maxLength: 200
           examples:
             - Task title
+
+    AssigneeSearchParameter:
+      name: assignee
+      description: Identifier of the assignee as search parameter
+      in: query
+      required: false
+      schema:
+        type: string
+        format: uuid
+        examples:
+          - c2ca22c8-33e7-424d-ba09-ece8b4fe083f
+          - ab3edd94-db81-4012-88d8-674423a4a671
+
+    RequesterSearchParameter:
+      name: requester
+      description: Identifier of the requester as search parameter
+      in: query
+      required: false
+      schema:
+        type: string
+        format: uuid
+        examples:
+          - c2ca22c8-33e7-424d-ba09-ece8b4fe083f
+          - ab3edd94-db81-4012-88d8-674423a4a671
+
+    DueDateSearchParameter:
+      name: dueBefore
+      description: Search parameter for tasks due up to the given date
+      in: query
+      required: false
+      schema:
+        type: string
+        format: date
+        examples:
+          - 2024-08-31
 
     VersionParameter:
       name: x-version
@@ -422,6 +457,8 @@ components:
           type: string
           minLength: 2
           maxLength: 2048
+          examples:
+            - Please define the outline with the number of pages for each chapter.
         dueDate:
           description: Date when the task is due
           type: string

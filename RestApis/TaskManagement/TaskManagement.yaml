@@ -1,0 +1,382 @@
+openapi: 3.1.0
+info:
+  title: Task Management
+  description: |
+    Task Management is a service where a user can define task and working on it.
+  contact:
+    email: annegret.junker@gmx.de
+    name: Annegret Junker
+    url: https://github.com/Grinseteddy
+  version: 1.0.0
+  x-api-id: c004ebd2-f9c6-4e21-aa41-826f8eaf4092
+servers:
+  - url: 'https://mydomain.com/task-management'
+security:
+  - openIdConnect:
+      - task:read
+      - task:write
+      - task:admin
+tags:
+  - name: Task
+    description: All endpoints handling tasks
+paths:
+  /resources:
+    get:
+      description: Using this endpoint a user gets back all task fulfilling their search criteria
+      operationId: getTasksByFilterCriteria
+      tags:
+        - Task
+      security:
+        - openIdConnect:
+            - resource:read
+      parameters:
+        - $ref: '#/components/parameters/SearchCriteriasParameter'
+        - $ref: '#/components/parameters/VersionParameter'
+      responses:
+        '200':
+          $ref: '#/components/responses/TaskListResponse'
+        '400':
+          $ref: '#/components/responses/BadRequestResponse'
+        '403':
+          $ref: '#/components/responses/ForbiddenResponse'
+        '500':
+          $ref: '#/components/responses/ServiceNotAvailableResponse'
+        default:
+          $ref: '#/components/responses/DefaultResponse'
+
+    post:
+      description: Creates a new Task
+      operationId: createNewRessource
+      tags:
+        - Name Tag
+      security:
+        - openIdConnect:
+            - resource:write
+      parameters:
+        - $ref: '#/components/parameters/VersionParameter'
+      requestBody:
+      # link to your resource to be created
+        $ref: '#/components/requestBodies/TaskToBeCreatedRequest'
+      responses:
+        '201':
+          $ref: '#/components/responses/LinkToTaskResponse'
+        '400':
+          $ref: '#/components/responses/BadRequestResponse'
+        '403':
+          $ref: '#/components/responses/ForbiddenResponse'
+        '500':
+          $ref: '#/components/responses/ServiceNotAvailableResponse'
+        default:
+          $ref: '#/components/responses/DefaultResponse'
+
+  /resources/{resourceIdentifier}:
+    get:
+      description: Description # describe your function
+      # define a unique operationId
+      operationId: getResourceById
+      tags:
+        - Name Tag
+      security:
+        - openIdConnect:
+            - resource:read
+      parameters:
+        - $ref: '#/components/parameters/TaskIdentifierParameter'
+        - $ref: '#/components/parameters/VersionParameter'
+      responses:
+        '200':
+        # Answer with your resource
+          $ref: '#/components/responses/SingleTaskResponse'
+        '400':
+          $ref: '#/components/responses/BadRequestResponse'
+        '403':
+          $ref: '#/components/responses/ForbiddenResponse'
+        '404':
+          $ref: '#/components/responses/NotFoundResponse'
+        '500':
+          $ref: '#/components/responses/ServiceNotAvailableResponse'
+        default:
+          $ref: '#/components/responses/DefaultResponse'
+
+    put:
+      description: Description # describe your function
+      # define a unique operationId
+      operationId: updateResourceById
+      tags:
+        - Name Tag
+      security:
+        - openIdConnect:
+            - resource:write
+      parameters:
+        - $ref: '#/components/parameters/TaskIdentifierParameter'
+        - $ref: '#/components/parameters/VersionParameter'
+      requestBody:
+        $ref: '#/components/requestBodies/TaskToBeChangedRequest'
+      responses:
+        '200':
+          $ref: '#/components/responses/LinkToTaskResponse'
+        '400':
+          $ref: '#/components/responses/BadRequestResponse'
+        '403':
+          $ref: '#/components/responses/ForbiddenResponse'
+        '404':
+          $ref: '#/components/responses/NotFoundResponse'
+        '500':
+          $ref: '#/components/responses/ServiceNotAvailableResponse'
+        default:
+          $ref: '#/components/responses/DefaultResponse'
+
+    delete:
+      description: Deletes a task identified by its id
+      operationId: deleteResourceById
+      tags:
+        - Task
+      security:
+        - openIdConnect:
+            - resource:admin
+      parameters:
+        - $ref: '#/components/parameters/TaskIdentifierParameter'
+        - $ref: '#/components/parameters/VersionParameter'
+      responses:
+        '200':
+          $ref: '#/components/responses/SuccessfulOperationResponse'
+        '400':
+          $ref: '#/components/responses/BadRequestResponse'
+        '403':
+          $ref: '#/components/responses/ForbiddenResponse'
+        '500':
+          $ref: '#/components/responses/ServiceNotAvailableResponse'
+        default:
+          $ref: '#/components/responses/DefaultResponse'
+
+components:
+  parameters:
+    TaskIdentifierParameter:
+      name: taskId
+      description: Task identifier
+      required: true
+      in: path
+      schema:
+        type: string
+        format: uuid
+        examples:
+          - 448b5bc-a9bc-4036-8899-c77f781a76d5
+
+    SearchCriteriasParameter:
+      name: searchCriteriasTitle
+      description: Search criteria to be used to be searched for a task
+      in: query
+      required: false
+      schema:
+        type: array
+        items:
+          type: string
+          minLength: 2
+          maxLength: 200
+          examples:
+            - Task title
+
+    VersionParameter:
+      name: x-version
+      description: Version of the API specification used delivered in header
+      in: header
+      required: true
+      schema:
+        type: string
+        x-extensible-enum:
+          - 1.0.0
+        default: 1.0.0
+        examples:
+          - 1.0.0
+
+  responses:
+    BadRequestResponse:
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+
+    ForbiddenResponse:
+      description: Forbidden
+
+    LinkToTaskResponse:
+      description: Successful operation - Task was created
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Link"
+
+    NotFoundResponse:
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+
+    TaskListResponse:
+      description: List of the resource you want to expose
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Tasks'
+
+    SingleTaskResponse:
+      description: Delivers back the resource to be exposed
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Task'
+
+    ServiceNotAvailableResponse:
+      description: Service not available
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+    DefaultResponse:
+      description: Unexpected error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+    SuccessfulOperationResponse:
+      description: Successful operation
+
+  requestBodies:
+
+    TaskToBeCreatedRequest:
+      description: Creates a new resource
+      content:
+        # could be an array in case a bunch of the resource should be created
+        application/json:
+          schema:
+            $ref: '#/components/schemas/TaskToBeCreated'
+
+    TaskToBeChangedRequest:
+      # needs to be updated by the resource you want to expose
+      description: Updates the resource provided
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Task'
+
+  schemas:
+    Error:
+      description: An error object used for error responses
+      type: object
+      required:
+        - title
+        - status
+        - timestamp
+      properties:
+        title:
+          description: A short description of the problem using kebab-cases
+          type: string
+          minLength: 2
+          maxLength: 255
+          examples:
+            - Resource not found
+        detail:
+          description: |
+            A human-readable description of the problem which can be used by technicians to solve the problem.
+          type: string
+          examples:
+            - The requested resource could not be found. Please check your URI.
+        timestamp:
+          description: Point in time when the error occurred
+          type: string
+          format: date-time
+          examples:
+            - 2024-07-01T23:32:54T+01:00
+        severity:
+          description: Severity of the according error
+          type: string
+          enum:
+            - FATAL
+            - ERROR
+            - WARNING
+            - INFO
+          examples:
+            - ERROR
+
+    Link:
+      description: Link to an entity
+      type: object
+      required:
+        - type
+        - link
+      properties:
+        type:
+          description: Not fully qualified type name of the object
+          type: string
+          minLength: 2
+          maxLength: 155
+          # adapt the examples with your exposed resource
+          examples:
+            - Resource
+        link:
+          description: URI to the according entity
+          type: string
+          format: uri
+          examples:
+            - https://mycompany.com/task-management/task/74d870fa-9e93-4ffd-907e-038c85e8bc20
+
+    Task:
+      description: A task a clerk can fulfill
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/TaskToBeCreated'
+      required:
+        - id
+      properties:
+        id:
+          description: Unique identifier for the task
+          type: string
+          format: uuid
+          examples:
+            - a07d62e1-5e2e-4e15-b50d-6ed412175443
+        assignee:
+          $ref: '#/components/schemas/Link'
+
+    Tasks:
+      type: array
+      minItems: 0
+      maxItems: 127
+      items:
+        $ref: '#/components/schemas/Task'
+
+    TaskToBeCreated:
+      description: A task created by a clerk
+      type: object
+      required:
+        - title
+        - dueDate
+      properties:
+        title:
+          description: A title of the task
+          type: string
+          minLength: 2
+          maxLength: 10
+          examples:
+            - Create a new book
+        description:
+          description: A longer description of the task
+          type: string
+          minLength: 2
+          maxLength: 2048
+        dueDate:
+          description: Date when the task is due
+          type: string
+          format: date
+          example: 2024-08-10
+
+
+  securitySchemes:
+    openIdConnect:
+      type: openIdConnect
+      description: Security scheme for events
+      openIdConnectUrl: "https://idp.myservice.de/configuration"

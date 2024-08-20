@@ -303,6 +303,43 @@ components:
           examples:
             - ERROR
 
+    LeanUser:
+      description: A user of the system defined in the user management with ID and name
+      type: object
+      required:
+        - id
+      properties:
+        id:
+          description: Identifier of the user
+          type: string
+          format: uuid
+          examples:
+            - c2ca22c8-33e7-424d-ba09-ece8b4fe083f
+            - ab3edd94-db81-4012-88d8-674423a4a671
+        name:
+          description: Family name of the user
+          type: string
+          minLength: 2
+          maxLength: 40
+          examples:
+            - Doe
+            - Smith
+        surname:
+          description: Given name of the user
+          type: string
+          minLength: 2
+          maxLength: 40
+          examples:
+            - John
+            - Joanna
+        link:
+          description: Link to the user resource in user management
+          type: string
+          format: uri
+          examples:
+            - https://mydomain.com/user-management/users/c2ca22c8-33e7-424d-ba09-ece8b4fe083f
+            - https://mydomain.com/user-management/users/ab3edd94-db81-4012-88d8-674423a4a671
+
     Link:
       description: Link to an entity
       type: object
@@ -332,6 +369,7 @@ components:
         - $ref: '#/components/schemas/TaskToBeCreated'
       required:
         - id
+        - creationDate
       properties:
         id:
           description: Unique identifier for the task
@@ -340,7 +378,22 @@ components:
           examples:
             - a07d62e1-5e2e-4e15-b50d-6ed412175443
         assignee:
-          $ref: '#/components/schemas/Link'
+          $ref: '#/components/schemas/LeanUser'
+        creationDate:
+          description: Date when the task was created
+          type: string
+          format: date
+          examples:
+            - 2024-08-01
+        status:
+          description: Status of the task
+          type: string
+          enum:
+            - NEW
+            - ASSIGNED
+            - IN_PROGRESS
+            - REJECTED
+            - DONE
 
     Tasks:
       type: array
@@ -355,6 +408,7 @@ components:
       required:
         - title
         - dueDate
+        - requester
       properties:
         title:
           description: A title of the task
@@ -373,6 +427,8 @@ components:
           type: string
           format: date
           example: 2024-08-10
+        requester:
+          $ref: '#/components/schemas/LeanUser'
 
 
   securitySchemes:

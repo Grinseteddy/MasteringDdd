@@ -38,8 +38,8 @@ class "Task"  as task <<(A,#FFFFFF) Aggregate>> {
     * creationDate: date
     description: Text
     * title: string
-    * assignee : LeanUser
-    requester: LeanUser
+    assignee : LeanUser
+    * requester: LeanUser
     * status: Status
 }
 

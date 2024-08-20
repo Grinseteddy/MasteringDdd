@@ -156,8 +156,8 @@ paths:
 components:
   parameters:
     ResourceIdentifierParameter:
-      name: memberId
-      description: Member identifier
+      name: resourceId
+      description: Resource identifier
       required: true
       in: path
       schema:
@@ -207,7 +207,7 @@ components:
       description: Forbidden
 
     LinkToResourceResponse:
-      description: Successful operation - Catalog entry created
+      description: Successful operation - entry created
       content:
         application/json:
           schema:

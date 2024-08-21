@@ -1,0 +1,404 @@
+openapi: 3.1.0
+info:
+  title: Member Management
+  description: API to create, change, and delete members
+  contact:
+    email: annegret.junker@gmx.de
+    name: Annegret Junker
+    url: https://github.com/Grinseteddy
+  version: 1.0.0
+  x-api-id: d1933d2c-e37e-476c-85ca-a32d3ba57e71
+servers:
+  - url: 'https://myonline-library.com/member-management'
+security:
+  - openIdConnect:
+      - member:read
+      - member:write
+      - member:admin
+tags:
+  - name: Member Management
+    description: All endpoints to handle members in self service
+  - name: Member Administration
+    description: All endpoints to handle members by an administrator
+paths:
+  /members:
+    post:
+      description: |
+        A new member can be created - after the member fee has been paid
+      operationId: createMember
+      tags:
+        - Member Management
+      security:
+        - openIdConnect:
+            - member:write
+      parameters:
+        - $ref: '#/components/parameters/VersionParameter'
+      requestBody:
+        $ref: '#/components/requestBodies/MemberToBeCreatedRequest'
+      responses:
+        '201':
+          $ref: '#/components/responses/LinkToMemberResponse'
+        '400':
+          $ref: '#/components/responses/BadRequestResponse'
+        '403':
+          $ref: '#/components/responses/ForbiddenResponse'
+        '500':
+          $ref: '#/components/responses/ServiceNotAvailableResponse'
+        default:
+          $ref: '#/components/responses/DefaultResponse'
+
+  /members/search:
+    post:
+      description: |
+        A member administrator can get all members based on certain search criteria e.g. their names or email-addresses.
+        To avoid to pass sensible data via a URL, the search criteria are provided via post.
+      operationId: createSearch
+      tags:
+        - Member Administration
+      security:
+        - openIdConnect:
+            - member:admin
+      parameters:
+        - $ref: '#/components/parameters/VersionParameter'
+      requestBody:
+        $ref: '#/components/requestBodies/SearchCriteriasRequestBody'
+      responses:
+        '200':
+          $ref: '#/components/responses/MembersResponse'
+        '400':
+          $ref: '#/components/responses/BadRequestResponse'
+        '403':
+          $ref: '#/components/responses/ForbiddenResponse'
+        '500':
+          $ref: '#/components/responses/ServiceNotAvailableResponse'
+        default:
+          $ref: '#/components/responses/DefaultResponse'
+
+  /members/{memberId}:
+    get:
+      description:
+        Delivers back the details of a member
+        It can be the members themselves or an administrator
+        For the members themselves, the member must be authenticated and the service checks the authorization based on
+        the provided token
+      operationId: getMemberById
+      tags:
+        - Member Management
+      security:
+        - openIdConnect:
+            - member:read
+            - member:admin
+      parameters:
+        - $ref: '#/components/parameters/MemberIdentifierParameter'
+        - $ref: '#/components/parameters/VersionParameter'
+      responses:
+        '200':
+          $ref: '#/components/responses/MemberResponse'
+        '400':
+          $ref: '#/components/responses/BadRequestResponse'
+        '403':
+          $ref: '#/components/responses/ForbiddenResponse'
+        '404':
+          $ref: '#/components/responses/NotFoundResponse'
+        '500':
+          $ref: '#/components/responses/ServiceNotAvailableResponse'
+        default:
+          $ref: '#/components/responses/DefaultResponse'
+
+    put:
+      description: A member or an administrator are able to change member data e.g. the name or the email address
+      operationId: updateMemberById
+      tags:
+        - Member Management
+        - Member Administration
+      security:
+        - openIdConnect:
+            - member:write
+            - member:admin
+      parameters:
+        - $ref: '#/components/parameters/MemberIdentifierParameter'
+        - $ref: '#/components/parameters/VersionParameter'
+      requestBody:
+        $ref: '#/components/requestBodies/MemberToBeChangedRequest'
+      responses:
+        '200':
+          $ref: '#/components/responses/LinkToMemberResponse'
+        '400':
+          $ref: '#/components/responses/BadRequestResponse'
+        '403':
+          $ref: '#/components/responses/ForbiddenResponse'
+        '404':
+          $ref: '#/components/responses/NotFoundResponse'
+        '500':
+          $ref: '#/components/responses/ServiceNotAvailableResponse'
+        default:
+          $ref: '#/components/responses/DefaultResponse'
+
+    delete:
+      description: |
+        A member is deleted - e.g. because they cancel the membership or the membership fee is not paid
+        Members can only be deleted by administrators
+      operationId: deleteMemberById
+      tags:
+        - Member Administration
+      security:
+        - openIdConnect:
+            - member:admin
+      parameters:
+        - $ref: '#/components/parameters/MemberIdentifierParameter'
+        - $ref: '#/components/parameters/VersionParameter'
+      responses:
+        '200':
+          $ref: '#/components/responses/SuccessfulOperationResponse'
+        '400':
+          $ref: '#/components/responses/BadRequestResponse'
+        '403':
+          $ref: '#/components/responses/ForbiddenResponse'
+        '500':
+          $ref: '#/components/responses/ServiceNotAvailableResponse'
+        default:
+          $ref: '#/components/responses/DefaultResponse'
+
+components:
+  parameters:
+    MemberIdentifierParameter:
+      name: memberId
+      description: Member identifier
+      required: true
+      in: path
+      schema:
+        type: string
+        format: uuid
+        examples:
+          - 8103ec7b-63d3-4e55-9677-60478061d00b
+
+    VersionParameter:
+      name: x-version
+      description: Version of the API specification used delivered in header
+      in: header
+      required: true
+      schema:
+        type: string
+        # Give here the versions of your specification supported by your implementation
+        x-extensible-enum:
+          - 1.0.0
+        default: 1.0.0
+        examples:
+          - 1.0.0
+
+  responses:
+    BadRequestResponse:
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+    ForbiddenResponse:
+      description: Forbidden
+
+    LinkToMemberResponse:
+      description: Successful operation - entry created
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Link"
+
+    NotFoundResponse:
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+    MembersResponse:
+      description: List of the resource you want to expose
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Members'
+
+    MemberResponse:
+      description: Delivers back the resource to be exposed
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Member'
+
+    ServiceNotAvailableResponse:
+      description: Service not available
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+    DefaultResponse:
+      description: Unexpected error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+    SuccessfulOperationResponse:
+      description: Successful operation
+
+  requestBodies:
+
+    MemberToBeCreatedRequest:
+      description: Creates a new member
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/MemberToBeCreated'
+
+    MemberToBeChangedRequest:
+      description: Member to be changed request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Member'
+
+    SearchCriteriasRequestBody:
+      description: Search criteria which can be sent to the server to search for a member
+      content:
+        application/json:
+          schema:
+            type: array
+            minItems: 1
+            maxItems: 20
+            items:
+              type: string
+              minLength: 2
+              maxLength: 55
+              examples:
+                - John
+                - Doe
+                - Joanna
+                - john.doe@gmail.com
+
+  schemas:
+    Error:
+      description: An error object used for error responses
+      type: object
+      required:
+        - title
+        - status
+        - timestamp
+      properties:
+        title:
+          description: A short description of the problem using kebab-cases
+          type: string
+          minLength: 2
+          maxLength: 255
+          examples:
+            - Resource not found
+        detail:
+          description: |
+            A human-readable description of the problem which can be used by technicians to solve the problem.
+          type: string
+          examples:
+            - The requested resource could not be found. Please check your URI.
+        timestamp:
+          description: Point in time when the error occurred
+          type: string
+          format: date-time
+          examples:
+            - 2024-07-01T23:32:54T+01:00
+        severity:
+          description: Severity of the according error
+          type: string
+          enum:
+            - FATAL
+            - ERROR
+            - WARNING
+            - INFO
+          examples:
+            - ERROR
+
+    Link:
+      description: Link to an entity
+      type: object
+      required:
+        - type
+        - link
+      properties:
+        type:
+          description: Not fully qualified type name of the object
+          type: string
+          minLength: 2
+          maxLength: 155
+          examples:
+            - Member
+        link:
+          description: URL to the according entity
+          type: string
+          format: uri
+          examples:
+            - https://myonline-library.com/member-management/8103ec7b-63d3-4e55-9677-60478061d00b
+
+    Member:
+      description: Member of the library
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/MemberToBeCreated'
+      required:
+        - id
+      properties:
+        id:
+          description: Unique identifier for the resource
+          type: string
+          format: uuid
+          examples:
+            - 8103ec7b-63d3-4e55-9677-60478061d00b
+
+    Members:
+      type: array
+      minItems: 0
+      maxItems: 127
+      items:
+        $ref: '#/components/schemas/Member'
+
+    MemberToBeCreated:
+      description: Member to be created, the member will be created after the payment fee has been paid
+      type: object
+      required:
+        - aTypicalProperty
+      properties:
+        familyName:
+          description: Family name of the member
+          type: string
+          minLength: 2
+          maxLength: 55
+          examples:
+            - Doe-Smith
+        givenName:
+          description: Given name of the member
+          type: string
+          minLength: 2
+          maxLength: 55
+          examples:
+            - John James
+        emailAddress:
+          description: Email address of the member
+          type: string
+          format: email
+          examples:
+            - john.doe@gmail.com
+        role:
+          description: Role in which the member uses the library
+          type: string
+          enum:
+            - STUDENT
+            - TEACHER
+            - MEMBER
+          default:
+            - MEMBER
+          examples:
+            - STUDENT
+
+
+  securitySchemes:
+    openIdConnect:
+      type: openIdConnect
+      description: Security scheme for events
+      openIdConnectUrl: "https://idp.myservice.de/configuration"

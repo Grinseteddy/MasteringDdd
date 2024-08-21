@@ -352,7 +352,7 @@ components:
           type: string
           format: uri
           examples:
-            - https://myonline-library.com/catalog-management/resources/74d870fa-9e93-4ffd-907e-038c85e8bc20
+            - https://myonline-library.com/catalog-management/catalog-entries/74d870fa-9e93-4ffd-907e-038c85e8bc20
 
     PublishingYear:
       description: The year when a book was published. The year is in the past.

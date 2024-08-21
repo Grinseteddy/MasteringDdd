@@ -339,7 +339,7 @@ components:
           type: string
           format: uri
           examples:
-            - https://myonline-library.com/member-management/8103ec7b-63d3-4e55-9677-60478061d00b
+            - https://myonline-library.com/member-management/members/8103ec7b-63d3-4e55-9677-60478061d00b
 
     Member:
       description: Member of the library

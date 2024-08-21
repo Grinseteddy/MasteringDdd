@@ -88,7 +88,7 @@ paths:
         - $ref: '#/components/parameters/VersionParameter'
       responses:
         '200':
-          $ref: '#/components/responses/SingleDiscussionResponse'
+          $ref: '#/components/responses/DiscussionResponse'
         '400':
           $ref: '#/components/responses/BadRequestResponse'
         '403':
@@ -170,7 +170,7 @@ paths:
         - $ref: '#/components/parameters/DiscussionIdentifierParameter'
         - $ref: '#/components/parameters/VersionParameter'
       requestBody:
-        - $ref: '#/components/requestBodies/InviteesToBeAddRequest'
+        $ref: '#/components/requestBodies/InviteesToBeCreatedRequest'
       responses:
         responses:
           '201':
@@ -189,7 +189,7 @@ paths:
   /discussions/{discussionId}/invitees/{inviteeId}:
     put:
       description:
-        An invitee can change his status of the invite. They can accept it or they can reject it.
+        An invitee can change status of the invite. They can accept it or they can reject it.
         An invite can reject their invite even if they have already accepted it. To reject an accepted invite
         is seen as leaving the discussion group.
     operationId: updateInviteeByIdAndByDiscussionId
@@ -221,7 +221,7 @@ paths:
 
     delete:
       description:
-        A initiator of a discussion can uninvite an invitee. They will leave the group independent of their
+        An initiator of a discussion can uninvite an invitee. They will leave the group independent of their
         invitation status.
       tags:
         - Invitees
@@ -384,11 +384,15 @@ components:
             $ref: '#/components/schemas/DiscussionToBeCreated'
 
     InviteesToBeCreatedRequest:
-      description: Creates a new discussion
+      description: Invites several member to a discussion
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/InviteesToBeCreated'
+            type: array
+            minItems: 1
+            maxItems: 20
+            items:
+              $ref: '#/components/schemas/InviteeToBeCreated'
 
     InviteesToBeChangedRequest:
       description: Invitees can change their status
@@ -458,48 +462,124 @@ components:
           examples:
             - https://myonline-library/discussions/discussions/dc975e44-9155-49b3-bbdc-45fd577e536a
 
-    Resource:
-      description: Description of the resource
+    Discussion:
+      description: A discussion initiated by a member
       type: object
       # allows some kind of polymorphism
       allOf:
-        - $ref: '#/components/schemas/ResourceToBeCreated'
+        - $ref: '#/components/schemas/DiscussionToBeCreated'
       required:
         - id
+        - bookTitle
+        - initiator
       properties:
         id:
           description: Unique identifier for the resource
           type: string
           format: uuid
           examples:
-            - a07d62e1-5e2e-4e15-b50d-6ed412175443
+            - dc975e44-9155-49b3-bbdc-45fd577e536a
+        bookTitle:
+          description: For convenience reason the book title is stored with the discussion
+          type: string
+          minLength: 2
+          maxLength: 255
+          examples:
+            - Domain-driven design
+        initiator:
+          description: Member identifier of the initiator of the discussion group
+          type: string
+          format: uuid
+          examples:
+            - 8103ec7b-63d3-4e55-9677-60478061d00b
+        initiatorName:
+          description: For convenience the name of the initiator is stored as well
+          type: string
+          minLength: 2
+          maxLength: 65
+          examples:
+            - Doe
+        invitees:
+          $ref: '#/components/schemas/Invitees'
 
-    Resources:
-    # needs t obe substituted by the resource you want to expose
+
+    Discussions:
     # Resource array to be delivered as bulk
       type: array
       minItems: 0
       maxItems: 127
       items:
-        $ref: '#/components/schemas/Resource'
+        $ref: '#/components/schemas/Discussion'
 
-    # needs to be substituted by the resource you want to expose
-    # To be created - usually the resource without identifier
-    ResourceToBeCreated:
-      description: Description of the resource
+    DiscussionToBeCreated:
+      description: |
+        Discussion to a certain book given by its identifier
+        The initiator is set by the server using the information of current user provided by their token
       type: object
       required:
-      # put here the properties which are mandatory for your resource
-        - aTypicalProperty
+        - bookToBeDiscussed
       properties:
-        aTypicalProperty:
-          description: A property of your resource
+        bookToBeDiscussed:
+          description: The identifier of the book to be discussed
           type: string
-          # try to define your properties as precise as possible
-          # use formats and patterns to limit th value area
-          pattern: ^[0-9A-Z]{1,125}$
+          format: uuid
           examples:
-            - ABC2345
+            - 011ba0b5-7f3b-479c-9282-fa272436cc89
+
+    Invitee:
+      description: |
+        Invitee to a discussion group. The invitee is given by their member identifier.
+        For convenience, the member name is stored as well.
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/InviteeToBeCreated'
+      required:
+        - id
+        - status
+      properties:
+        id:
+          description: Identifier of the invitee
+          type: string
+          format: uuid
+          examples:
+            - 2c4365b7-d26b-4ecd-b742-b6e7fe8cdfce
+        inviteeName:
+          description: For convenience the name of the invitee is stored
+          type: string
+          minLength: 2
+          maxLength: 65
+          examples:
+            - Smith
+        status:
+          - PENDING
+          - ACCEPTED
+        # when an invitee rejects their invitation, they do not appear in the group anymore
+        # therefore a status "REJECTED" does not appear
+
+
+    InviteeToBeCreated:
+      description: |
+        An initiator of a group can invite member to a discussion group
+        An invitee gets the status PENDING as long as the member does not have accepted their invitation
+      type: object
+      required:
+        - memberIdentifier
+      properties:
+        memberIdentifier:
+          description: Member identifier of the invitee
+          type: string
+          format: uuid
+          examples:
+            - 2c4365b7-d26b-4ecd-b742-b6e7fe8cdfce
+
+    Invitees:
+      description: An array of invitees
+      type: array
+      minItems: 0
+      maxItems: 20
+      items:
+        $ref: '#/components/schemas/Invitee'
+
 
   securitySchemes:
     openIdConnect:

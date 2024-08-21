@@ -173,8 +173,8 @@ components:
           - 448b5bc-a9bc-4036-8899-c77f781a76d5
 
     SearchCriteriasParameter:
-      name: searchCriterias
-      description: Search criterias for a fulltext search
+      name: searchCriteria
+      description: Search criterias for a fulltext search e.g. author, title or ISBN
       in: query
       required: false
       schema:
@@ -184,7 +184,9 @@ components:
           minLength: 2
           maxLength: 200
           examples:
-            - bla bla
+            - Eric Evans
+            - Domain-driven design
+            - 978-0321125217
 
     SearchParameterPublishedNotBefore:
       name: publishedNotBefore
@@ -368,8 +370,8 @@ components:
         - 2023
         - 583 bc
 
-    Resource:
-      description: Description of the resource
+    CatalogEntry:
+      description: An entry in the catalog representing a book
       type: object
       # allows some kind of polymorphism
       allOf:
@@ -384,32 +386,84 @@ components:
           examples:
             - a07d62e1-5e2e-4e15-b50d-6ed412175443
 
-    Resources:
-    # needs t obe substituted by the resource you want to expose
+    CatalogEntries:
     # Resource array to be delivered as bulk
       type: array
       minItems: 0
-      maxItems: 127
+      maxItems: 255
       items:
-        $ref: '#/components/schemas/Resource'
+        $ref: '#/components/schemas/CatalogEntries'
 
     # needs to be substituted by the resource you want to expose
     # To be created - usually the resource without identifier
-    ResourceToBeCreated:
-      description: Description of the resource
+    CatalogEntryToBeCreated:
+      description: A catalog entry representing a book
       type: object
       required:
-      # put here the properties which are mandatory for your resource
-        - aTypicalProperty
+        - authors
       properties:
-        aTypicalProperty:
-          description: A property of your resource
+        authors:
+          description: |
+            Authors of the book with family name and given name(s) divided by comma,
+            Anonymous published books get the author name Anonymous
+            Names originally not spelled with Latin characters follow the spelling given by the publisher
+          type: array
+          items:
+            type: string
+            minLength: 2
+            maxLength: 55
+            examples:
+              - Evans, Eric
+              - Tune, Nick
+              - Lazarelli, Fabrizio
+        title:
+          description: Title of the book as given by the publisher, usually not capitalized
           type: string
-          # try to define your properties as precise as possible
-          # use formats and patterns to limit th value area
-          pattern: ^[0-9A-Z]{1,125}$
+          minLength: 2
+          maxLength: 255
           examples:
-            - ABC2345
+            - Domain-driven design
+            - Architecture modernization
+            - Domain-driven API design
+        subtitle:
+          description: Subtitle of the book as given by the publisher
+          type: string
+          minLength: 2
+          maxLength: 255
+          examples:
+            - Tackling complexity in the heart of software
+            - Socio-technical alignment of software, strategy, and structure
+            - Crafting great APIs using DDD
+        publisher:
+          description: Publisher of the book
+          type: string
+          minLength: 2
+          maxLength: 255
+          examples:
+            - Pearson International
+            - Manning
+            - APress
+        blurb:
+          description: Product description given by the publisher
+          type: string
+          minLength: 10
+          maxLength: 2048
+          examples:
+            - The software development community widely acknowledges that domain modeling is central to software design.
+        isbn-10:
+          description: International standard book number with 10 digits
+          type: string
+          pattern: ^[0-9]{10}$
+          examples:
+            - 0321125215
+        isbn-13:
+          description: International standard book number with 13 digits
+          type: string
+          pattern: ^[0-9]{3}-?[0-9]{10}$
+          examples:
+            - 978-0321125217
+
+
 
   securitySchemes:
     openIdConnect:

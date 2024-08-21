@@ -1,40 +1,40 @@
 openapi: 3.1.0
 info:
-  title: Skeleton
-  description: A skeleton which can be used to create OpenAPI specifications
+  title: Notes
+  description: Notes management allows member to create and edit notes to a book
   contact:
     email: annegret.junker@gmx.de
     name: Annegret Junker
     url: https://github.com/Grinseteddy
   version: 1.0.0
-  x-api-id: c004ebd2-f9c6-4e21-aa41-826f8eaf4092
+  x-api-id: bac6de80-d60b-4fb0-9e10-3b0bd38eb1be
 servers:
-  - url: 'https://mydomain.com/service'
+  - url: 'https://myonline-library.com/notes-manament'
 security:
   - openIdConnect:
-      - resource:read
-      - resource:write
-      - resource:admin
+      - notes:read
+      - notes:write
+      - notes:admin
 tags:
-  - name: Name Tag
-    description: Description
+  - name: Notes
+    description: All endpoint belonging to manage notes by a member
 paths:
-  /resources:
+  /notes:
     get:
-      description: Description # describe your function
-      # define a unique operationId
-      operationId: getResourceByFilterCriteria
+      description: The notes are search by the book identifier and further text
+      operationId: getNotesByContent
       tags:
-        - Name Tag
+        - Notes
       security:
         - openIdConnect:
-            - resource:read
+            - notes:read
       parameters:
-        - $ref: '#/components/parameters/SearchCriteriasParameter'
+        - $ref: '#/components/parameters/ContentSearchParameter'
+        - $ref: '#/components/parameters/BookIdentifierParameter'
         - $ref: '#/components/parameters/VersionParameter'
       responses:
         '200':
-          $ref: '#/components/responses/ResourceListResponse'
+          $ref: '#/components/responses/NotesResponse'
         '400':
           $ref: '#/components/responses/BadRequestResponse'
         '403':
@@ -45,22 +45,21 @@ paths:
           $ref: '#/components/responses/DefaultResponse'
 
     post:
-      description: Description # describe your function
-      # define a unique operationId
-      operationId: createNewRessource
+      description: Creates a new note to a book
+      operationId: createNewNote
       tags:
-        - Name Tag
+        - Notes
       security:
         - openIdConnect:
-            - resource:write
+            - notes:write
       parameters:
         - $ref: '#/components/parameters/VersionParameter'
+        - $ref: '#/components/parameters/BookIdentifierParameter'
       requestBody:
-      # link to your resource to be created
-        $ref: '#/components/requestBodies/ResourceToBeCreatedRequest'
+        $ref: '#/components/requestBodies/NoteToBeCreatedRequest'
       responses:
         '201':
-          $ref: '#/components/responses/LinkToResourceResponse'
+          $ref: '#/components/responses/LinkToNoteResponse'
         '400':
           $ref: '#/components/responses/BadRequestResponse'
         '403':
@@ -70,23 +69,23 @@ paths:
         default:
           $ref: '#/components/responses/DefaultResponse'
 
-  /resources/{resourceIdentifier}:
+  /notes/{noteId}:
     get:
-      description: Description # describe your function
-      # define a unique operationId
-      operationId: getResourceById
+      description: Gets a specific note by its identifier
+      operationId: getNoteById
       tags:
-        - Name Tag
+        - Notes
       security:
         - openIdConnect:
-            - resource:read
+            - notes:read
       parameters:
-        - $ref: '#/components/parameters/ResourceIdentifierParameter'
+        - $ref: '#/components/parameters/NoteIdentifierParameter'
+        - $ref: '#/components/parameters/BookIdentifierParameter'
         - $ref: '#/components/parameters/VersionParameter'
       responses:
         '200':
         # Answer with your resource
-          $ref: '#/components/responses/SingleResourceResponse'
+          $ref: '#/components/responses/NoteResponse'
         '400':
           $ref: '#/components/responses/BadRequestResponse'
         '403':
@@ -99,23 +98,22 @@ paths:
           $ref: '#/components/responses/DefaultResponse'
 
     put:
-      description: Description # describe your function
-      # define a unique operationId
-      operationId: updateResourceById
+      description: Changes a particular note
+      operationId: updateNoteById
       tags:
-        - Name Tag
+        - Notes
       security:
         - openIdConnect:
-            - resource:write
+            - notes:write
       parameters:
-        - $ref: '#/components/parameters/ResourceIdentifierParameter'
+        - $ref: '#/components/parameters/NoteIdentifierParameter'
+        - $ref: '#/components/parameters/BookIdentifierParameter'
         - $ref: '#/components/parameters/VersionParameter'
       requestBody:
-      # Link to your resource to be updated
-        $ref: '#/components/requestBodies/ResourceToBeChangedRequest'
+        $ref: '#/components/requestBodies/NoteToBeChangedRequest'
       responses:
         '200':
-          $ref: '#/components/responses/LinkToResourceResponse'
+          $ref: '#/components/responses/LinkToNoteResponse'
         '400':
           $ref: '#/components/responses/BadRequestResponse'
         '403':
@@ -137,7 +135,8 @@ paths:
         - openIdConnect:
             - resource:admin
       parameters:
-        - $ref: '#/components/parameters/ResourceIdentifierParameter'
+        - $ref: '#/components/parameters/NoteIdentifierParameter'
+        - $ref: '#/components/parameters/BookIdentifierParameter'
         - $ref: '#/components/parameters/VersionParameter'
       responses:
         '200':
@@ -155,30 +154,43 @@ paths:
 
 components:
   parameters:
-    ResourceIdentifierParameter:
-      name: resourceId
-      description: Resource identifier
+    NoteIdentifierParameter:
+      name: noteId
+      description: Note identifier
       required: true
       in: path
       schema:
         type: string
         format: uuid
         examples:
-          - 448b5bc-a9bc-4036-8899-c77f781a76d5
+          - ab5f8ba8-ea8f-4b3c-957e-9f0f7530ae01
 
-    SearchCriteriasParameter:
+    BookIdentifierParameter:
+      name: bookId
+      description: Book identifier
+      required: true
+      in: query
+      schema:
+        type: string
+        format: uuid
+        examples:
+          - 3a2e5b0e-4edc-463e-af30-afdf7530e4cc
+
+    ContentSearchParameter:
       name: searchCriterias
-      description: A single search criteria
+      description: Search criteria such as a note text
       in: query
       required: false
       schema:
         type: array
+        minItems: 0
+        maxItems: 20
         items:
           type: string
           minLength: 2
-          maxLength: 200
+          maxLength: 1054
           examples:
-            - bla bla
+            - I found this always inspiring.
 
     VersionParameter:
       name: x-version
@@ -206,7 +218,7 @@ components:
     ForbiddenResponse:
       description: Forbidden
 
-    LinkToResourceResponse:
+    LinkToNoteResponse:
       description: Successful operation - entry created
       content:
         application/json:
@@ -221,21 +233,19 @@ components:
             $ref: '#/components/schemas/Error'
 
 
-    # Needs to be substituted by the resource you want to expose
-    ResourceListResponse:
-      description: List of the resource you want to expose
+    NotesResponse:
+      description: List of the notes
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/Resources'
+            $ref: '#/components/schemas/Notes'
 
-    # Needs to be substituted by the resource you want to expose
-    SingleResourceResponse:
-      description: Delivers back the resource to be exposed
+    NoteResponse:
+      description: Delivers back a note
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/Resource'
+            $ref: '#/components/schemas/Note'
 
     ServiceNotAvailableResponse:
       description: Service not available
@@ -255,22 +265,21 @@ components:
       description: Successful operation
 
   requestBodies:
-    # needs to be substituted by the resource you want to expose
-    ResourceToBeCreatedRequest:
-      description: Creates a new resource
+
+    NoteToBeCreatedRequest:
+      description: Creates a new note
       content:
-        # could be an array in case a bunch of the resource should be created
         application/json:
           schema:
-            $ref: '#/components/schemas/ResourceToBeCreated'
+            $ref: '#/components/schemas/NoteToBeCreated'
 
-    ResourceToBeChangedRequest:
+    NoteToBeChangedRequest:
       # needs to be updated by the resource you want to expose
       description: Updates the resource provided
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/Resource'
+            $ref: '#/components/schemas/Note'
 
   schemas:
     Error:
@@ -323,58 +332,94 @@ components:
           type: string
           minLength: 2
           maxLength: 155
-          # adapt the examples with your exposed resource
           examples:
-            - Resource
+            - Note
         link:
           description: URL to the according entity
           type: string
           format: uri
           examples:
-            - https://mydomain.com/resource-management/resources/74d870fa-9e93-4ffd-907e-038c85e8bc20
+            - https://myonline-library.com/notes-management/notes/ab5f8ba8-ea8f-4b3c-957e-9f0f7530ae01
 
-    Resource:
-      description: Description of the resource
+    Note:
+      description: A note belonging to a specific passage of a particular book
       type: object
-      # allows some kind of polymorphism
       allOf:
-        - $ref: '#/components/schemas/ResourceToBeCreated'
+        - $ref: '#/components/schemas/NoteToBeCreated'
       required:
         - id
       properties:
         id:
-          description: Unique identifier for the resource
+          description: Unique identifier for the note
           type: string
           format: uuid
           examples:
-            - a07d62e1-5e2e-4e15-b50d-6ed412175443
+            - ab5f8ba8-ea8f-4b3c-957e-9f0f7530ae01
 
-    Resources:
-    # needs t obe substituted by the resource you want to expose
-    # Resource array to be delivered as bulk
-      type: array
-      minItems: 0
-      maxItems: 127
-      items:
-        $ref: '#/components/schemas/Resource'
+    Notes:
+      description: All notes belonging to one book
+      type: object
+      properties:
+        bookIdentifier:
+          description: Identifier of the book to which the notes belong
+          type: string
+          format: uuid
+          examples:
+            - 5c1bb1a0-ea3e-4ced-b89f-1f88253869e3
+        bookTitle:
+          description: For convenience, the book title is stored besides the identifier
+          type: string
+          minLength: 2
+          macLength: 255
+          examples:
+            - Patterns and Tricks
+        owner:
+          description: Owner of the notes who is allowed to change them, given by their member ID
+          type: string
+          format: uuid
+          examples:
+            - 9963a0b9-934e-41ec-bf62-af2c1669264e
+        ownerName:
+          description: For convenience, the owner is stored by their name to be shown e.g. in discussions
+          type: string
+          minLength: 2
+          maxLength: 65
+          examples:
+            - Miller
+        notes:
+          type: array
+          minItems: 0
+          maxItems: 255
+          items:
+            $ref: '#/components/schemas/Note'
 
-    # needs to be substituted by the resource you want to expose
-    # To be created - usually the resource without identifier
-    ResourceToBeCreated:
-      description: Description of the resource
+    NoteToBeCreated:
+      description: A note belonging to a book and owned by a certain member
       type: object
       required:
-      # put here the properties which are mandatory for your resource
         - aTypicalProperty
       properties:
-        aTypicalProperty:
-          description: A property of your resource
-          type: string
-          # try to define your properties as precise as possible
-          # use formats and patterns to limit th value area
-          pattern: ^[0-9A-Z]{1,125}$
+        startPosition:
+          description: The start position in the text, where the note belongs to
+          type: integer
+          format: int64
+          minimum: 0
           examples:
-            - ABC2345
+            - 1024
+        endPosition:
+          description: The end position in the next, where the note belongs to, must be larger or equal than startPosition
+          type: integer
+          format: int64
+          minimum: 0
+          examples:
+            - 1065
+        text:
+          description: Text of the note belonging to the given text position
+          type: string
+          minLength: 0
+          maxLength: 1024
+          examples:
+            - This part is really good.
 
   securitySchemes:
     openIdConnect:

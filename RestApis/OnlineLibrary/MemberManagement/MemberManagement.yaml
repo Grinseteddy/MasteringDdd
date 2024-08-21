@@ -52,8 +52,8 @@ paths:
   /members/search:
     post:
       description: |
-        A member administrator can get all members based on certain search criteria e.g. their names or email-addresses.
-        To avoid to pass sensible data via a URL, the search criteria are provided via post.
+        A member administrator can get all members based on specific search criteria e.g. their names or email-addresses.
+        To avoid passing sensible data via a URL, the search criteria are provided via post.
         Members can be found by name or email address to be invited by other members. The members can only be found, if
         the according flag is set.
       operationId: createSearch

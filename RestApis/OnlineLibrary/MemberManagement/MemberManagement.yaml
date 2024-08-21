@@ -1,72 +1,43 @@
 openapi: 3.1.0
 info:
-  title: Catalog management of the online library
-  description: The catalog contains the books a member can search for e.g. by title or author
+  title: Member Management
+  description: API to create, change, and delete members
   contact:
     email: annegret.junker@gmx.de
     name: Annegret Junker
     url: https://github.com/Grinseteddy
   version: 1.0.0
-  x-api-id: e4baac2e-365d-4de2-bcec-c1d1c968fb30
+  x-api-id: d1933d2c-e37e-476c-85ca-a32d3ba57e71
 servers:
-  - url: 'https://myonline-library.com/catalog-management'
+  - url: 'https://myonline-library.com/member-management'
 security:
   - openIdConnect:
-      - catalog:read
-      - catalog:write
-      - catalog:admin
-      - catalogentry:read
-      - catalogentry:write
-      - catalogentry:admin
+      - member:read
+      - member:write
+      - member:admin
 tags:
-  - name: Catalog Entries
-    description: All endpoints handling catalog entries
+  - name: Member Management
+    description: All endpoints to handle members in self service
+  - name: Member Administration
+    description: All endpoints to handle members by an administrator
 paths:
-  # /catalogs:
-    # for the moment we assume we have only one catalog
-  /catalog-entries:
-    get:
-      description: Using this function one can search for catalog entries by several entries e.g. title or authors, or publishing year
-      operationId: getCatalogEntryByFilterCriteria
-      tags:
-        - Catalog Entries
-      security:
-        - openIdConnect:
-            - catalogentry:read
-      parameters:
-        - $ref: '#/components/parameters/SearchCriteriasParameter'
-        - $ref: '#/components/parameters/SearchParameterPublishedNotBefore'
-        - $ref: '#/components/parameters/SearchParameterPublishedAfter'
-        - $ref: '#/components/parameters/VersionParameter'
-      responses:
-        '200':
-          $ref: '#/components/responses/CatalogEntriesResponse'
-        '400':
-          $ref: '#/components/responses/BadRequestResponse'
-        '403':
-          $ref: '#/components/responses/ForbiddenResponse'
-        '500':
-          $ref: '#/components/responses/ServiceNotAvailableResponse'
-        default:
-          $ref: '#/components/responses/DefaultResponse'
-
+  /members:
     post:
-      description: Description # describe your function
-      # define a unique operationId
-      operationId: createNewRessource
+      description: |
+        A new member can be created - after the member fee has been paid
+      operationId: createMember
       tags:
-        - Catalog Entries
+        - Member Management
       security:
         - openIdConnect:
-            - catalogentry:write
+            - member:write
       parameters:
         - $ref: '#/components/parameters/VersionParameter'
       requestBody:
-      # link to your resource to be created
-        $ref: '#/components/requestBodies/CatalogEntryToBeCreatedRequest'
+        $ref: '#/components/requestBodies/MemberToBeCreatedRequest'
       responses:
         '201':
-          $ref: '#/components/responses/LinkToCatalogEntryResponse'
+          $ref: '#/components/responses/LinkToMemberResponse'
         '400':
           $ref: '#/components/responses/BadRequestResponse'
         '403':
@@ -76,23 +47,53 @@ paths:
         default:
           $ref: '#/components/responses/DefaultResponse'
 
-  /catalog-entries/{catalogEntryId}:
-    get:
-      description: Description # describe your function
-      # define a unique operationId
-      operationId: getCatalogEntryById
+  /members/search:
+    post:
+      description: |
+        A member administrator can get all members based on certain search criteria e.g. their names or email-addresses.
+        To avoid to pass sensible data via a URL, the search criteria are provided via post.
+      operationId: createSearch
       tags:
-        - Catalog Entries
+        - Member Administration
       security:
         - openIdConnect:
-            - catalogentry:read
+            - member:admin
       parameters:
-        - $ref: '#/components/parameters/CatalogEntryIdentifierParameter'
+        - $ref: '#/components/parameters/VersionParameter'
+      requestBody:
+        $ref: '#/components/parameters/SearchCriteriasRequestBody'
+      responses:
+        '200':
+          $ref: '#/components/responses/MembersResponse'
+        '400':
+          $ref: '#/components/responses/BadRequestResponse'
+        '403':
+          $ref: '#/components/responses/ForbiddenResponse'
+        '500':
+          $ref: '#/components/responses/ServiceNotAvailableResponse'
+        default:
+          $ref: '#/components/responses/DefaultResponse'
+
+  /members/{memberId}:
+    get:
+      description:
+        Delivers back the details of a member
+        It can be the members themselves or an administrator
+        For the members themselves, the member must be authenticated and the service checks the authorization based on
+        the provided token
+      operationId: getMemberById
+      tags:
+        - Member Management
+      security:
+        - openIdConnect:
+            - member:read
+            - member:admin
+      parameters:
+        - $ref: '#/components/parameters/MemberIdentifierParameter'
         - $ref: '#/components/parameters/VersionParameter'
       responses:
         '200':
-        # Answer with your resource
-          $ref: '#/components/responses/CatalogEntryResponse'
+          $ref: '#/components/responses/MemberResponse'
         '400':
           $ref: '#/components/responses/BadRequestResponse'
         '403':
@@ -107,20 +108,21 @@ paths:
     put:
       description: Description # describe your function
       # define a unique operationId
-      operationId: updateCatalogEntryById
+      operationId: updateResourceById
       tags:
-        - Catalog Entries
+        - Name Tag
       security:
         - openIdConnect:
-            - catalogentry:write
+            - resource:write
       parameters:
-        - $ref: '#/components/parameters/CatalogEntryIdentifierParameter'
+        - $ref: '#/components/parameters/ResourceIdentifierParameter'
         - $ref: '#/components/parameters/VersionParameter'
       requestBody:
-        $ref: '#/components/requestBodies/CatalogEntryToBeChangedRequest'
+      # Link to your resource to be updated
+        $ref: '#/components/requestBodies/ResourceToBeChangedRequest'
       responses:
         '200':
-          $ref: '#/components/responses/LinkToCatalogEntryResponse'
+          $ref: '#/components/responses/LinkToResourceResponse'
         '400':
           $ref: '#/components/responses/BadRequestResponse'
         '403':
@@ -135,14 +137,14 @@ paths:
     delete:
       description: Description # describe your function
       # define a unique operationId
-      operationId: deleteCatalogEntryById
+      operationId: deleteResourceById
       tags:
-        - Catalog Entries
+        - Name Tag
       security:
         - openIdConnect:
-            - catalogentry:admin
+            - resource:admin
       parameters:
-        - $ref: '#/components/parameters/CatalogEntryIdentifierParameter'
+        - $ref: '#/components/parameters/ResourceIdentifierParameter'
         - $ref: '#/components/parameters/VersionParameter'
       responses:
         '200':
@@ -160,9 +162,9 @@ paths:
 
 components:
   parameters:
-    CatalogEntryIdentifierParameter:
-      name: catalogEntryId
-      description: Catalog entry identifier
+    ResourceIdentifierParameter:
+      name: resourceId
+      description: Resource identifier
       required: true
       in: path
       schema:
@@ -172,8 +174,8 @@ components:
           - 448b5bc-a9bc-4036-8899-c77f781a76d5
 
     SearchCriteriasParameter:
-      name: searchCriteria
-      description: Search criterias for a fulltext search e.g. author, title or ISBN
+      name: searchCriterias
+      description: A single search criteria
       in: query
       required: false
       schema:
@@ -183,29 +185,7 @@ components:
           minLength: 2
           maxLength: 200
           examples:
-            - Eric Evans
-            - Domain-driven design
-            - 978-0321125217
-
-    SearchParameterPublishedNotBefore:
-      name: publishedNotBefore
-      description: |
-        A search parameter based on publishing year. The year needs to be in the past.
-        The year mus be larger or equal to the year given.
-      in: query
-      required: false
-      schema:
-        $ref: '#/components/schemas/PublishingYear'
-
-    SearchParameterPublishedAfter:
-      name: publishedAfter
-      description: |
-        A search parameter based on publishing year. The year needs to be in the past.
-        The year mus be smaller or equal to the year given.
-      in: query
-      required: false
-      schema:
-        $ref: '#/components/schemas/PublishingYear'
+            - bla bla
 
     VersionParameter:
       name: x-version
@@ -233,7 +213,7 @@ components:
     ForbiddenResponse:
       description: Forbidden
 
-    LinkToCatalogEntryResponse:
+    LinkToResourceResponse:
       description: Successful operation - entry created
       content:
         application/json:
@@ -247,19 +227,22 @@ components:
           schema:
             $ref: '#/components/schemas/Error'
 
-    CatalogEntriesResponse:
+
+    # Needs to be substituted by the resource you want to expose
+    ResourceListResponse:
       description: List of the resource you want to expose
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/CatalogEntries'
+            $ref: '#/components/schemas/Resources'
 
-    CatalogEntryResponse:
+    # Needs to be substituted by the resource you want to expose
+    SingleResourceResponse:
       description: Delivers back the resource to be exposed
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/CatalogEntry'
+            $ref: '#/components/schemas/Resource'
 
     ServiceNotAvailableResponse:
       description: Service not available
@@ -279,20 +262,22 @@ components:
       description: Successful operation
 
   requestBodies:
-
-    CatalogEntryToBeCreatedRequest:
+    # needs to be substituted by the resource you want to expose
+    ResourceToBeCreatedRequest:
       description: Creates a new resource
       content:
+        # could be an array in case a bunch of the resource should be created
         application/json:
           schema:
-            $ref: '#/components/schemas/CatalogEntryToBeCreated'
+            $ref: '#/components/schemas/ResourceToBeCreated'
 
-    CatalogEntryToBeChangedRequest:
+    ResourceToBeChangedRequest:
+      # needs to be updated by the resource you want to expose
       description: Updates the resource provided
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/CatalogEntry'
+            $ref: '#/components/schemas/Resource'
 
   schemas:
     Error:
@@ -355,106 +340,48 @@ components:
           examples:
             - https://mydomain.com/resource-management/resources/74d870fa-9e93-4ffd-907e-038c85e8bc20
 
-    PublishingYear:
-      description: The year when a book was published. The year is in the past.
-      type: string
-      pattern: ^[0-9]{1,4} ?[a,b]?.?c?.?$
-      examples:
-        - 1964
-        - 2023
-        - 583 bc
-
-    CatalogEntry:
-      description: An entry in the catalog representing a book
+    Resource:
+      description: Description of the resource
       type: object
+      # allows some kind of polymorphism
       allOf:
-        - $ref: '#/components/schemas/CatalogEntryToBeCreated'
+        - $ref: '#/components/schemas/ResourceToBeCreated'
       required:
         - id
       properties:
         id:
-          description: Unique identifier for the catalog entry
+          description: Unique identifier for the resource
           type: string
           format: uuid
           examples:
             - a07d62e1-5e2e-4e15-b50d-6ed412175443
 
-    CatalogEntries:
+    Resources:
+    # needs t obe substituted by the resource you want to expose
     # Resource array to be delivered as bulk
       type: array
       minItems: 0
-      maxItems: 255
+      maxItems: 127
       items:
-        $ref: '#/components/schemas/CatalogEntry'
+        $ref: '#/components/schemas/Resource'
 
-    CatalogEntryToBeCreated:
-      description: A catalog entry representing a book
+    # needs to be substituted by the resource you want to expose
+    # To be created - usually the resource without identifier
+    ResourceToBeCreated:
+      description: Description of the resource
       type: object
       required:
-        - authors
-        - title
-        - isbn-10
+      # put here the properties which are mandatory for your resource
+        - aTypicalProperty
       properties:
-        authors:
-          description: |
-            Authors of the book with family name and given name(s) divided by comma,
-            Anonymous published books get the author name Anonymous
-            Names originally not spelled with Latin characters follow the spelling given by the publisher
-          type: array
-          items:
-            type: string
-            minLength: 2
-            maxLength: 55
-            examples:
-              - Evans, Eric
-              - Tune, Nick
-              - Lazzaretti, Fabrizio
-        title:
-          description: Title of the book as given by the publisher, usually not capitalized
+        aTypicalProperty:
+          description: A property of your resource
           type: string
-          minLength: 2
-          maxLength: 255
+          # try to define your properties as precise as possible
+          # use formats and patterns to limit th value area
+          pattern: ^[0-9A-Z]{1,125}$
           examples:
-            - Domain-driven design
-            - Architecture modernization
-            - Domain-driven API design
-        subtitle:
-          description: Subtitle of the book as given by the publisher
-          type: string
-          minLength: 2
-          maxLength: 255
-          examples:
-            - Tackling complexity in the heart of software
-            - Socio-technical alignment of software, strategy, and structure
-            - Crafting great APIs using DDD
-        publisher:
-          description: Publisher of the book
-          type: string
-          minLength: 2
-          maxLength: 255
-          examples:
-            - Pearson International
-            - Manning
-            - APress
-        blurb:
-          description: Product description given by the publisher
-          type: string
-          minLength: 10
-          maxLength: 2048
-          examples:
-            - The software development community widely acknowledges that domain modeling is central to software design.
-        isbn-10:
-          description: International standard book number with 10 digits
-          type: string
-          pattern: ^[0-9]{10}$
-          examples:
-            - 0321125215
-        isbn-13:
-          description: International standard book number with 13 digits
-          type: string
-          pattern: ^[0-9]{3}-?[0-9]{10}$
-          examples:
-            - 978-0321125217
+            - ABC2345
 
   securitySchemes:
     openIdConnect:

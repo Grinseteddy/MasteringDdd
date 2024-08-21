@@ -32,7 +32,7 @@ paths:
         - Catalog Entry
       security:
         - openIdConnect:
-            - resource:read
+            - catalogentry:read
       parameters:
         - $ref: '#/components/parameters/SearchCriteriasParameter'
         - $ref: '#/components/parameters/SearchParameterPublishedNotBefore'
@@ -40,7 +40,7 @@ paths:
         - $ref: '#/components/parameters/VersionParameter'
       responses:
         '200':
-          $ref: '#/components/responses/ResourceListResponse'
+          $ref: '#/components/responses/CatalogEntriesResponse'
         '400':
           $ref: '#/components/responses/BadRequestResponse'
         '403':
@@ -58,15 +58,15 @@ paths:
         - Name Tag
       security:
         - openIdConnect:
-            - resource:write
+            - catalogentry:write
       parameters:
         - $ref: '#/components/parameters/VersionParameter'
       requestBody:
       # link to your resource to be created
-        $ref: '#/components/requestBodies/ResourceToBeCreatedRequest'
+        $ref: '#/components/requestBodies/CatalogEntryToBeCreatedRequest'
       responses:
         '201':
-          $ref: '#/components/responses/LinkToResourceResponse'
+          $ref: '#/components/responses/LinkToCatalogEntryResponse'
         '400':
           $ref: '#/components/responses/BadRequestResponse'
         '403':
@@ -76,23 +76,23 @@ paths:
         default:
           $ref: '#/components/responses/DefaultResponse'
 
-  /resources/{resourceIdentifier}:
+  /catalog-entries/{catalogEntryId}:
     get:
       description: Description # describe your function
       # define a unique operationId
-      operationId: getResourceById
+      operationId: getCatalogEntryById
       tags:
-        - Name Tag
+        - Catalog Entriex
       security:
         - openIdConnect:
-            - resource:read
+            - catalogentry:read
       parameters:
-        - $ref: '#/components/parameters/ResourceIdentifierParameter'
+        - $ref: '#/components/parameters/CatalogEntryIdentifierParameter'
         - $ref: '#/components/parameters/VersionParameter'
       responses:
         '200':
         # Answer with your resource
-          $ref: '#/components/responses/SingleResourceResponse'
+          $ref: '#/components/responses/CatalogEntryResponse'
         '400':
           $ref: '#/components/responses/BadRequestResponse'
         '403':
@@ -107,21 +107,20 @@ paths:
     put:
       description: Description # describe your function
       # define a unique operationId
-      operationId: updateResourceById
+      operationId: updateCatalogEntryById
       tags:
-        - Name Tag
+        - Catalog Entries
       security:
         - openIdConnect:
-            - resource:write
+            - catalogentry:write
       parameters:
-        - $ref: '#/components/parameters/ResourceIdentifierParameter'
+        - $ref: '#/components/parameters/CatalogEntryIdentifierParameter'
         - $ref: '#/components/parameters/VersionParameter'
       requestBody:
-      # Link to your resource to be updated
-        $ref: '#/components/requestBodies/ResourceToBeChangedRequest'
+        $ref: '#/components/requestBodies/CatalogEntryToBeChangedRequest'
       responses:
         '200':
-          $ref: '#/components/responses/LinkToResourceResponse'
+          $ref: '#/components/responses/LinkToCatalogEntryResponse'
         '400':
           $ref: '#/components/responses/BadRequestResponse'
         '403':
@@ -136,14 +135,14 @@ paths:
     delete:
       description: Description # describe your function
       # define a unique operationId
-      operationId: deleteResourceById
+      operationId: deleteCatalogEntryById
       tags:
-        - Name Tag
+        - Catalog entries
       security:
         - openIdConnect:
-            - resource:admin
+            - catalogentry:admin
       parameters:
-        - $ref: '#/components/parameters/ResourceIdentifierParameter'
+        - $ref: '#/components/parameters/CatalogEntryIdentifierParameter'
         - $ref: '#/components/parameters/VersionParameter'
       responses:
         '200':
@@ -161,9 +160,9 @@ paths:
 
 components:
   parameters:
-    ResourceIdentifierParameter:
-      name: resourceId
-      description: Resource identifier
+    CatalogEntryIdentifierParameter:
+      name: catalogEntryId
+      description: Catalog entry identifier
       required: true
       in: path
       schema:
@@ -234,7 +233,7 @@ components:
     ForbiddenResponse:
       description: Forbidden
 
-    LinkToResourceResponse:
+    LinkToCatalogEntryResponse:
       description: Successful operation - entry created
       content:
         application/json:
@@ -248,22 +247,19 @@ components:
           schema:
             $ref: '#/components/schemas/Error'
 
-
-    # Needs to be substituted by the resource you want to expose
-    ResourceListResponse:
+    CatalogEntriesResponse:
       description: List of the resource you want to expose
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/Resources'
+            $ref: '#/components/schemas/CatalogEntries'
 
-    # Needs to be substituted by the resource you want to expose
-    SingleResourceResponse:
+    CatalogEntryResponse:
       description: Delivers back the resource to be exposed
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/Resource'
+            $ref: '#/components/schemas/CatalogEntry'
 
     ServiceNotAvailableResponse:
       description: Service not available
@@ -283,22 +279,20 @@ components:
       description: Successful operation
 
   requestBodies:
-    # needs to be substituted by the resource you want to expose
-    ResourceToBeCreatedRequest:
+
+    CatalogEntryToBeCreatedRequest:
       description: Creates a new resource
       content:
-        # could be an array in case a bunch of the resource should be created
         application/json:
           schema:
-            $ref: '#/components/schemas/ResourceToBeCreated'
+            $ref: '#/components/schemas/CatalogEntryToBeCreated'
 
-    ResourceToBeChangedRequest:
-      # needs to be updated by the resource you want to expose
+    CatalogEntryToBeChangedRequest:
       description: Updates the resource provided
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/Resource'
+            $ref: '#/components/schemas/CatalogEntry'
 
   schemas:
     Error:
@@ -373,14 +367,13 @@ components:
     CatalogEntry:
       description: An entry in the catalog representing a book
       type: object
-      # allows some kind of polymorphism
       allOf:
-        - $ref: '#/components/schemas/ResourceToBeCreated'
+        - $ref: '#/components/schemas/CatalogEntryToBeCreated'
       required:
         - id
       properties:
         id:
-          description: Unique identifier for the resource
+          description: Unique identifier for the catalog entry
           type: string
           format: uuid
           examples:
@@ -392,15 +385,15 @@ components:
       minItems: 0
       maxItems: 255
       items:
-        $ref: '#/components/schemas/CatalogEntries'
+        $ref: '#/components/schemas/CatalogEntry'
 
-    # needs to be substituted by the resource you want to expose
-    # To be created - usually the resource without identifier
     CatalogEntryToBeCreated:
       description: A catalog entry representing a book
       type: object
       required:
         - authors
+        - title
+        - isbn-10
       properties:
         authors:
           description: |
@@ -415,7 +408,7 @@ components:
             examples:
               - Evans, Eric
               - Tune, Nick
-              - Lazarelli, Fabrizio
+              - Lazzaretti, Fabrizio
         title:
           description: Title of the book as given by the publisher, usually not capitalized
           type: string
@@ -462,8 +455,6 @@ components:
           pattern: ^[0-9]{3}-?[0-9]{10}$
           examples:
             - 978-0321125217
-
-
 
   securitySchemes:
     openIdConnect:

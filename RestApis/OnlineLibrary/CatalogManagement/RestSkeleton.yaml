@@ -1,36 +1,42 @@
 openapi: 3.1.0
 info:
-  title: Skeleton
-  description: A skeleton which can be used to create OpenAPI specifications
+  title: Catalog management of the online library
+  description: The catalog contains the books a member can search for e.g. by title or author
   contact:
     email: annegret.junker@gmx.de
     name: Annegret Junker
     url: https://github.com/Grinseteddy
   version: 1.0.0
-  x-api-id: c004ebd2-f9c6-4e21-aa41-826f8eaf4092
+  x-api-id: e4baac2e-365d-4de2-bcec-c1d1c968fb30
 servers:
-  - url: 'https://mydomain.com/service'
+  - url: 'https://myonline-library.com/catalog-management'
 security:
   - openIdConnect:
-      - resource:read
-      - resource:write
-      - resource:admin
+      - catalog:read
+      - catalog:write
+      - catalog:admin
+      - catalogentry:read
+      - catalogentry:write
+      - catalogentry:admin
 tags:
-  - name: Name Tag
-    description: Description
+  - name: Catalog Entries
+    description: All endpoints handling catalog entries
 paths:
-  /resources:
+  /catalogs:
+    # for the moment we assume we have only one catalog
+  /catalog-entries:
     get:
-      description: Description # describe your function
-      # define a unique operationId
-      operationId: getResourceByFilterCriteria
+      description: Using this function one can search for catalog entries by several entries e.g. title or authors, or publishing year
+      operationId: getCatalogEntryByFilterCriteria
       tags:
-        - Name Tag
+        - Catalog Entry
       security:
         - openIdConnect:
             - resource:read
       parameters:
         - $ref: '#/components/parameters/SearchCriteriasParameter'
+        - $ref: '#/components/parameters/SearchParameterPublishedNotBefore'
+        - $ref: '#/components/parameters/SearchParameterPublishedAfter'
         - $ref: '#/components/parameters/VersionParameter'
       responses:
         '200':
@@ -168,7 +174,7 @@ components:
 
     SearchCriteriasParameter:
       name: searchCriterias
-      description: A single search criteria
+      description: Search criterias for a fulltext search
       in: query
       required: false
       schema:
@@ -179,6 +185,26 @@ components:
           maxLength: 200
           examples:
             - bla bla
+
+    SearchParameterPublishedNotBefore:
+      name: publishedNotBefore
+      description: |
+        A search parameter based on publishing year. The year needs to be in the past.
+        The year mus be larger or equal to the year given.
+      in: query
+      required: false
+      schema:
+        $ref: '#/components/schemas/PublishingYear'
+
+    SearchParameterPublishedAfter:
+      name: publishedAfter
+      description: |
+        A search parameter based on publishing year. The year needs to be in the past.
+        The year mus be smaller or equal to the year given.
+      in: query
+      required: false
+      schema:
+        $ref: '#/components/schemas/PublishingYear'
 
     VersionParameter:
       name: x-version
@@ -332,6 +358,15 @@ components:
           format: uri
           examples:
             - https://mydomain.com/resource-management/resources/74d870fa-9e93-4ffd-907e-038c85e8bc20
+
+    PublishingYear:
+      description: The year when a book was published. The year is in the past.
+      type: string
+      pattern: ^[0-9]{1,4} ?[a,b]?.?c?.?$
+      examples:
+        - 1964
+        - 2023
+        - 583 bc
 
     Resource:
       description: Description of the resource

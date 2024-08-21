@@ -20,6 +20,8 @@ tags:
     description: All endpoints to handle members in self service
   - name: Member Administration
     description: All endpoints to handle members by an administrator
+  - name: Discussions
+    description: All endpoints necessary to find members for discussions
 paths:
   /members:
     post:
@@ -52,9 +54,12 @@ paths:
       description: |
         A member administrator can get all members based on certain search criteria e.g. their names or email-addresses.
         To avoid to pass sensible data via a URL, the search criteria are provided via post.
+        Members can be found by name or email address to be invited by other members. The members can only be found, if
+        the according flag is set.
       operationId: createSearch
       tags:
         - Member Administration
+        - Discussions
       security:
         - openIdConnect:
             - member:admin
@@ -362,7 +367,9 @@ components:
       description: Member to be created, the member will be created after the payment fee has been paid
       type: object
       required:
-        - aTypicalProperty
+        - familyName
+        - emailAddress
+        - canBeFoundByOthers
       properties:
         familyName:
           description: Family name of the member
@@ -395,6 +402,12 @@ components:
             - MEMBER
           examples:
             - STUDENT
+        canBeFoundByOthers:
+          description: If this flag is true, the member allows to be found by other members
+          type: boolean
+          default: false
+          examples:
+            - false
 
 
   securitySchemes:

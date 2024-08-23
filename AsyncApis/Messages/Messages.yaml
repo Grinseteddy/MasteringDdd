@@ -11,6 +11,72 @@ info:
 defaultContentType:
   application/json
 
+channels:
+  BookPurchasedEventChannel:
+    description: Channel where messages are stored when a book was purchased
+    address: book-purchased
+    messages:
+      BookPurchasedEvent:
+        $ref: '#/components/messages/BookPurchasedEvent'
+
+  CatalogEntryCreatedEventChannel:
+    description: Channel were messages are stored when a catalog entry was created
+    address: catalog-entry-created
+    messages:
+      CatalogEntryCreatedEvent:
+        $ref: '#/components/messages/CatalogEntryCreatedEvent'
+
+  CatalogEntryUpdatedEventChannel:
+    description: Channel were messages are stored when a catalog entry was updated
+    address: catalog-entry-updated
+    messages:
+      CatalogEntryUpdatedEvent:
+        $ref: '#/components/messages/CatalogEntryUpdatedEvent'
+
+  CreateNotificationCommandChannel:
+    description: Channel were messages are stored when a notification should be created
+    address: create-notification
+    messages:
+      CreateNotificationCommand:
+        $ref: '#/components/messages/CreateNotificationCommand'
+
+
+  BookLentEventChannel:
+    description: Channel were messages are stored when a book was lent
+    address: book-lent
+    messages:
+      BookLentEvent:
+        $ref: '#/components/schemas/BookLentEvent'
+
+  BookReturnedEventChannel:
+    description: Channel were messages are stored when a book was returned
+    address: book-returned
+    messages:
+      BookReturnedEvent:
+        $ref: '#/components/schemas/BookReturnedEvent'
+
+  MemberCreatedEventChannel:
+    description: Channel were messages are stored when a member was created
+    address: member-created
+    messages:
+      MemberCreatedEvent:
+        $ref: '#/components/schemas/MemberCreatedEvent'
+
+  AmountPaidEvent:
+    description: Channel for amount paid events
+    address: amount-paid
+    messages:
+      AmountPaidEvent:
+        $ref: '#/components/schemas/AmountPaidEvent'
+
+  ReadingPositionMarkedEvent:
+    description: Channel for reading positions events
+    address: reading-position-marked
+    messages:
+      ReadingPositionMarkedEvent:
+        $ref: '#/components/schemas/ReadingPositionMarkedEvent'
+
+
 components:
   messages:
     BookPurchasedEvent:
@@ -61,7 +127,7 @@ components:
       payload:
         $ref: '#/components/schemas/AmountPaid'
 
-    ReadingPositionMarking:
+    ReadingPositionMarkedEvent:
       headers:
         $ref: '#/components/schemas/MessageHeader'
       payload:
@@ -327,9 +393,7 @@ components:
         type: object
         required:
           - id
-          - familyName
           - emailAddress
-          - canBeFoundByOthers
         properties:
           id:
             description: Identifier of the member
@@ -344,36 +408,12 @@ components:
             maxLength: 55
             examples:
               - Doe-Smith
-          givenName:
-            description: Given name of the member
-            type: string
-            minLength: 2
-            maxLength: 55
-            examples:
-              - John James
           emailAddress:
             description: Email address of the member
             type: string
             format: email
             examples:
               - john.doe@gmail.com
-          role:
-            description: Role in which the member uses the library
-            type: string
-            enum:
-              - STUDENT
-              - TEACHER
-              - MEMBER
-            default:
-              - MEMBER
-            examples:
-              - STUDENT
-          canBeFoundByOthers:
-            description: If this flag is true, the member allows to be found by other members
-            type: boolean
-            default: false
-            examples:
-              - false
 
     Amount:
       description: Amount of a fee
@@ -422,6 +462,12 @@ components:
         - textPositionStart
         - textPositionEnd
       properties:
+        bookIdentifier:
+          description: Identifier of the catalog entry to which the book read referenced
+          type: string
+          format: uuid
+          examples:
+            - e4667e38-0dd2-481a-b755-69d0ad136fa0
         textPositionStart:
           description: Start of the marking
           type: integer

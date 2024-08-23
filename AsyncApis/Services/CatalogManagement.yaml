@@ -1,0 +1,56 @@
+asyncapi: 3.0.0
+info:
+  title: Catalog Manamement
+  version: 1.0.0
+  description: |
+    Asynchronous APIs for Catalog Management
+  contact:
+    name: Annegret Junker
+    email: annegret.junker@gmx.de
+servers:
+  production:
+    # other messaging brokers needs to be defined - look in the documentation
+    host: "events.myonline-library.com:9092"
+    protocol: "kafka"
+    description: "Production broker"
+  testing:
+    # other messaging brokers needs to be defined - look in the documentation
+    host: "events.testing.myonline-library.com:9092"
+    protocol: "kafka"
+    description: "Testing broker"
+
+defaultContentType:
+  application/json
+
+operations:
+  BookPurchasedEventReceive:
+    action: "receive"
+    channel:
+      $ref: "../Messages.yaml#/channels/BookPurchaseEventChannel"
+
+  CatalogEntryCreatedEventSend:
+    action: "send"
+    channel:
+      $ref: '../Messages.yaml#/channels/CatalogEntryCreatedEventChannel'
+
+  CatalogEntryUpdatedEventSend:
+    action: "send"
+    channel:
+      $ref: '../Messages.yaml#/channels/CatalogEntryCreatedEventChannel'
+
+
+components:
+
+  securitySchemes:
+    openIdConnect:
+      type: openIdConnect
+      description: Security scheme for events
+      openIdConnectUrl: "https://idp.myonline-library.org/configuration"
+
+
+
+
+
+
+
+

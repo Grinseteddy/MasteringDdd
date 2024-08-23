@@ -1,0 +1,53 @@
+asyncapi: 3.0.0
+info:
+  title: Audio Summary
+  version: 1.0.0
+  description: |
+    Asynchronous API definition of Audio Summary
+  contact:
+    name: Annegret Junker
+    email: annegret.junker@gmx.de
+servers:
+  production:
+    # other messaging brokers needs to be defined - look in the documentation
+    host: "events.myonline-library.com:9092"
+    protocol: "kafka"
+    description: "Production broker"
+  testing:
+    # other messaging brokers needs to be defined - look in the documentation
+    host: "events.testing.myonline-library.com:9092"
+    protocol: "kafka"
+    description: "Testing broker"
+
+defaultContentType:
+  application/json
+
+channels:
+  BookPurchasedEvent:
+    description: Channel where messages are stored when a book was purchased
+    address: book-purchased
+    messages:
+      BookPurchasedEvent:
+        $ref: '../Messages.yaml#/components/messages/BookPurchasedEvent'
+
+operations:
+  bookPurchaseEventIn:
+    action: "receive"
+    channel:
+      $ref: "#/channels/BookPurchasedEvent"
+
+components:
+
+  securitySchemes:
+    openIdConnect:
+      type: openIdConnect
+      description: Security scheme for events
+      openIdConnectUrl: "https://idp.myonline-library.org/configuration"
+
+
+
+
+
+
+
+

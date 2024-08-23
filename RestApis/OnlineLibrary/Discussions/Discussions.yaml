@@ -1,0 +1,588 @@
+openapi: 3.1.0
+info:
+  title: Discussions
+  description: |
+    Managing discussion in the online library. Member can invite other members for discussions.
+    Invites need to be accepted.
+  contact:
+    email: annegret.junker@gmx.de
+    name: Annegret Junker
+    url: https://github.com/Grinseteddy
+  version: 1.0.0
+  x-api-id: 8ad17341-9ac2-41a7-b890-5ddcfc24462d
+servers:
+  - url: 'https://myonline-library/discussions'
+security:
+  - openIdConnect:
+      - discussion:read
+      - discussion:write
+      - discussion:admin
+tags:
+  - name: Discussion
+    description: Creation and managing of discussions
+  - name: Invitees
+    description: Management of invitees of discussions
+paths:
+  /discussions:
+    get:
+      description:
+        Delivers back all discussions a member has access to.
+        It might be discussions, they initiate themselves or discussions to that they were invited
+        Discussions can be searched by book titles, authors, or even ISBNs
+      operationId: getDiscussionByFilterCriteria
+      tags:
+        - Discussions
+      security:
+        - openIdConnect:
+            - discussion:read
+      parameters:
+        - $ref: '#/components/parameters/SearchCriteriasParameter'
+        - $ref: '#/components/parameters/VersionParameter'
+      responses:
+        '200':
+          $ref: '#/components/responses/DiscussionsResponse'
+        '400':
+          $ref: '#/components/responses/BadRequestResponse'
+        '403':
+          $ref: '#/components/responses/ForbiddenResponse'
+        '500':
+          $ref: '#/components/responses/ServiceNotAvailableResponse'
+        default:
+          $ref: '#/components/responses/DefaultResponse'
+
+    post:
+      description: A member can create a new discussion using a book they want to discuss
+      operationId: createNewDiscussion
+      tags:
+        - Discussions
+      security:
+        - openIdConnect:
+            - discussion:write
+      parameters:
+        - $ref: '#/components/parameters/VersionParameter'
+      requestBody:
+        $ref: '#/components/requestBodies/DiscussionToBeCreatedRequest'
+      responses:
+        '201':
+          $ref: '#/components/responses/LinkToDiscussionResponse'
+        '400':
+          $ref: '#/components/responses/BadRequestResponse'
+        '403':
+          $ref: '#/components/responses/ForbiddenResponse'
+        '500':
+          $ref: '#/components/responses/ServiceNotAvailableResponse'
+        default:
+          $ref: '#/components/responses/DefaultResponse'
+
+  /discussions/{discussionId}:
+    get:
+      description: Access to a certain discussion
+      operationId: getDiscussionById
+      tags:
+        - Discussion
+      security:
+        - openIdConnect:
+            - discussion:read
+      parameters:
+        - $ref: '#/components/parameters/DiscussionIdentifierParameter'
+        - $ref: '#/components/parameters/VersionParameter'
+      responses:
+        '200':
+          $ref: '#/components/responses/DiscussionResponse'
+        '400':
+          $ref: '#/components/responses/BadRequestResponse'
+        '403':
+          $ref: '#/components/responses/ForbiddenResponse'
+        '404':
+          $ref: '#/components/responses/NotFoundResponse'
+        '500':
+          $ref: '#/components/responses/ServiceNotAvailableResponse'
+        default:
+          $ref: '#/components/responses/DefaultResponse'
+
+  # a discussion is in the end only a link to a book and invitees, therefore they cannot be changed
+  # but they can be closed - we use the delete verb for it
+
+    delete:
+      description: |
+        Closing a discussion means that the invitees cannot longer read the notes of the other members to a book.
+        Only an initiator of a discussion can close the discussion
+      operationId: deleteDiscussionById
+      tags:
+        - Discussion
+      security:
+        - openIdConnect:
+            - discussion:admin
+      parameters:
+        - $ref: '#/components/parameters/DiscussionIdentifierParameter'
+        - $ref: '#/components/parameters/VersionParameter'
+      responses:
+        '200':
+          $ref: '#/components/responses/SuccessfulOperationResponse'
+        '400':
+          $ref: '#/components/responses/BadRequestResponse'
+        '403':
+          $ref: '#/components/responses/ForbiddenResponse'
+        '404':
+          $ref: '#/components/responses/NotFoundResponse'
+        '500':
+          $ref: '#/components/responses/ServiceNotAvailableResponse'
+        default:
+          $ref: '#/components/responses/DefaultResponse'
+
+  /discussions/{discussionId}/invitees:
+    get:
+      description: |
+        Returns all invitees of a discussion with their invite status
+        Invitees can be accessed by all discussion member who have already accept the invite
+      operationId: getAllInviteesOfADiscussionByItsId
+      tags:
+        - Invitees
+      security:
+        - openIdConnect:
+            - discussion:read
+      parameters:
+        - $ref: '#/components/parameters/DiscussionIdentifierParameter'
+        - $ref: '#/components/parameters/VersionParameter'
+      responses:
+        '200':
+          $ref: '#/components/responses/InviteesResponse'
+        '400':
+          $ref: '#/components/responses/BadRequestResponse'
+        '403':
+          $ref: '#/components/responses/ForbiddenResponse'
+        '500':
+          $ref: '#/components/responses/ServiceNotAvailableResponse'
+        default:
+          $ref: '#/components/responses/DefaultResponse'
+
+    post:
+      description: |
+        The initiator of a discussion can invite other members of the library to the discussion
+        The member are given just by their member identifiers. The initiator needs to search them first.
+      operationId: addInviteesToDiscussionById
+      tags:
+        - Invitees
+      security:
+        - openIdConnect:
+            - discussion:admin
+      parameters:
+        - $ref: '#/components/parameters/DiscussionIdentifierParameter'
+        - $ref: '#/components/parameters/VersionParameter'
+      requestBody:
+        $ref: '#/components/requestBodies/InviteesToBeCreatedRequest'
+      responses:
+        responses:
+          '201':
+            $ref: '#/components/responses/LinkToDiscussionResponse'
+          '400':
+            $ref: '#/components/responses/BadRequestResponse'
+          '403':
+            $ref: '#/components/responses/ForbiddenResponse'
+          '404':
+            $ref: '#/components/responses/NotFoundResponse'
+          '500':
+            $ref: '#/components/responses/ServiceNotAvailableResponse'
+          default:
+            $ref: '#/components/responses/DefaultResponse'
+
+  /discussions/{discussionId}/invitees/{inviteeId}:
+    put:
+      description:
+        An invitee can change status of the invite. They can accept it or they can reject it.
+        An invite can reject their invite even if they have already accepted it. To reject an accepted invite
+        is seen as leaving the discussion group.
+    operationId: updateInviteeByIdAndByDiscussionId
+    tags:
+      - Invitees
+    security:
+      - openIdConnect:
+          - discussion:write
+    parameters:
+      - $ref: '#/components/parameters/DiscussionIdentifierParameter'
+      - $ref: '#/components/parameters/VersionParameter'
+      - $ref: '#/components/parameters/InviteeIdentifierParameter'
+    requestBody:
+      $ref: '#/components/schemas/Invitee'
+    responses:
+      responses:
+        '200':
+          $ref: '#/components/responses/LinkToInviteeResponse'
+        '400':
+          $ref: '#/components/responses/BadRequestResponse'
+        '403':
+          $ref: '#/components/responses/ForbiddenResponse'
+        '404':
+          $ref: '#/components/responses/NotFoundResponse'
+        '500':
+          $ref: '#/components/responses/ServiceNotAvailableResponse'
+        default:
+          $ref: '#/components/responses/DefaultResponse'
+
+    delete:
+      description:
+        An initiator of a discussion can uninvite an invitee. They will leave the group independent of their
+        invitation status.
+      tags:
+        - Invitees
+      parameters:
+        - $ref: '#/components/parameters/DiscussionIdentifierParameter'
+        - $ref: '#/components/parameters/VersionParameter'
+        - $ref: '#/components/parameters/InviteeIdentifierParameter'
+      responses:
+        '200':
+          $ref: '#/components/responses/SuccessfulOperationResponse'
+        '400':
+          $ref: '#/components/responses/BadRequestResponse'
+        '403':
+          $ref: '#/components/responses/ForbiddenResponse'
+        '404':
+          $ref: '#/components/responses/NotFoundResponse'
+        '500':
+          $ref: '#/components/responses/ServiceNotAvailableResponse'
+        default:
+          $ref: '#/components/responses/DefaultResponse'
+
+components:
+  parameters:
+    DiscussionIdentifierParameter:
+      name: discussionId
+      description: Discussion identifier
+      required: true
+      in: path
+      schema:
+        type: string
+        format: uuid
+        examples:
+          - dc975e44-9155-49b3-bbdc-45fd577e536a
+
+    InviteeIdentifierParameter:
+      name: inviteeId
+      description: Invitee identifier
+      required: true
+      in: path
+      schema:
+        type: string
+        format: uuid
+        examples:
+          - e63d2f08-a2c2-4d29-98d4-8c220df209a9
+
+    SearchCriteriasParameter:
+      name: searchCriterias
+      description: Search criteria for a book or an initiator to find discussion groups
+      in: query
+      required: false
+      schema:
+        type: array
+        minItems: 1
+        maxItems: 10
+        items:
+          type: string
+          minLength: 2
+          maxLength: 20
+          examples:
+            - Evans
+            - Fabrizio
+
+    VersionParameter:
+      name: x-version
+      description: Version of the API specification used delivered in header
+      in: header
+      required: true
+      schema:
+        type: string
+        # Give here the versions of your specification supported by your implementation
+        x-extensible-enum:
+          - 1.0.0
+        default: 1.0.0
+        examples:
+          - 1.0.0
+
+  responses:
+    BadRequestResponse:
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+    ForbiddenResponse:
+      description: Forbidden
+
+    LinkToDiscussionResponse:
+      description: Successful operation - entry created
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Link"
+
+    LinkToInviteeResponse:
+      description: Successful operation - entry created
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Link"
+
+    NotFoundResponse:
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+    DiscussionsResponse:
+      description: List of the resource you want to expose
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Discussions'
+
+    InviteesResponse:
+      description: List of the resource you want to expose
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Invitees'
+
+    DiscussionResponse:
+      description: Delivers back the resource to be exposed
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Discussion'
+
+    InviteeResponse:
+      description: Delivers back the resource to be exposed
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Invitee'
+
+    ServiceNotAvailableResponse:
+      description: Service not available
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+    DefaultResponse:
+      description: Unexpected error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+    SuccessfulOperationResponse:
+      description: Successful operation
+
+  requestBodies:
+    DiscussionToBeCreatedRequest:
+      description: Creates a new discussion
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/DiscussionToBeCreated'
+
+    InviteesToBeCreatedRequest:
+      description: Invites several member to a discussion
+      content:
+        application/json:
+          schema:
+            type: array
+            minItems: 1
+            maxItems: 20
+            items:
+              $ref: '#/components/schemas/InviteeToBeCreated'
+
+    InviteesToBeChangedRequest:
+      description: Invitees can change their status
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Invitee'
+
+  schemas:
+    Error:
+      description: An error object used for error responses
+      type: object
+      required:
+        - title
+        - status
+        - timestamp
+      properties:
+        title:
+          description: A short description of the problem using kebab-cases
+          type: string
+          minLength: 2
+          maxLength: 255
+          examples:
+            - Resource not found
+        detail:
+          description: |
+            A human-readable description of the problem which can be used by technicians to solve the problem.
+          type: string
+          examples:
+            - The requested resource could not be found. Please check your URI.
+        timestamp:
+          description: Point in time when the error occurred
+          type: string
+          format: date-time
+          examples:
+            - 2024-07-01T23:32:54T+01:00
+        severity:
+          description: Severity of the according error
+          type: string
+          enum:
+            - FATAL
+            - ERROR
+            - WARNING
+            - INFO
+          examples:
+            - ERROR
+
+    Link:
+      description: Link to an entity
+      type: object
+      required:
+        - type
+        - link
+      properties:
+        type:
+          description: Not fully qualified type name of the object
+          type: string
+          minLength: 2
+          maxLength: 155
+          examples:
+            - Discussion
+            - Invitee
+        link:
+          description: URL to the according entity
+          type: string
+          format: uri
+          examples:
+            - https://myonline-library/discussions/discussions/dc975e44-9155-49b3-bbdc-45fd577e536a
+
+    Discussion:
+      description: A discussion initiated by a member
+      type: object
+      # allows some kind of polymorphism
+      allOf:
+        - $ref: '#/components/schemas/DiscussionToBeCreated'
+      required:
+        - id
+        - bookTitle
+        - initiator
+      properties:
+        id:
+          description: Unique identifier for the resource
+          type: string
+          format: uuid
+          examples:
+            - dc975e44-9155-49b3-bbdc-45fd577e536a
+        bookTitle:
+          description: For convenience reason the book title is stored with the discussion
+          type: string
+          minLength: 2
+          maxLength: 255
+          examples:
+            - Domain-driven design
+        initiator:
+          description: Member identifier of the initiator of the discussion group
+          type: string
+          format: uuid
+          examples:
+            - 8103ec7b-63d3-4e55-9677-60478061d00b
+        initiatorName:
+          description: For convenience the name of the initiator is stored as well
+          type: string
+          minLength: 2
+          maxLength: 65
+          examples:
+            - Doe
+        invitees:
+          $ref: '#/components/schemas/Invitees'
+
+
+    Discussions:
+    # Resource array to be delivered as bulk
+      type: array
+      minItems: 0
+      maxItems: 127
+      items:
+        $ref: '#/components/schemas/Discussion'
+
+    DiscussionToBeCreated:
+      description: |
+        Discussion to a certain book given by its identifier
+        The initiator is set by the server using the information of current user provided by their token
+      type: object
+      required:
+        - bookToBeDiscussed
+      properties:
+        bookToBeDiscussed:
+          description: The identifier of the book to be discussed
+          type: string
+          format: uuid
+          examples:
+            - 011ba0b5-7f3b-479c-9282-fa272436cc89
+
+    Invitee:
+      description: |
+        Invitee to a discussion group. The invitee is given by their member identifier.
+        For convenience, the member name is stored as well.
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/InviteeToBeCreated'
+      required:
+        - id
+        - status
+      properties:
+        id:
+          description: Identifier of the invitee
+          type: string
+          format: uuid
+          examples:
+            - 2c4365b7-d26b-4ecd-b742-b6e7fe8cdfce
+        inviteeName:
+          description: For convenience the name of the invitee is stored
+          type: string
+          minLength: 2
+          maxLength: 65
+          examples:
+            - Smith
+        status:
+          - PENDING
+          - ACCEPTED
+        # when an invitee rejects their invitation, they do not appear in the group anymore
+        # therefore a status "REJECTED" does not appear
+
+
+    InviteeToBeCreated:
+      description: |
+        An initiator of a group can invite member to a discussion group
+        An invitee gets the status PENDING as long as the member does not have accepted their invitation
+      type: object
+      required:
+        - memberIdentifier
+      properties:
+        memberIdentifier:
+          description: Member identifier of the invitee
+          type: string
+          format: uuid
+          examples:
+            - 2c4365b7-d26b-4ecd-b742-b6e7fe8cdfce
+
+    Invitees:
+      description: An array of invitees
+      type: array
+      minItems: 0
+      maxItems: 20
+      items:
+        $ref: '#/components/schemas/Invitee'
+
+
+  securitySchemes:
+    openIdConnect:
+      type: openIdConnect
+      description: Security scheme for events
+      openIdConnectUrl: "https://idp.myservice.de/configuration"

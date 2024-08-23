@@ -24,39 +24,39 @@ defaultContentType:
 
 channels:
 
-  resourceEventIn:
+  ResourceEventIn:
     address: "service/resourceIn"
     messages:
       resourceEventIn:
-        $ref: '#/components/messages/resourceEventInMessage'
+        $ref: '#/components/messages/ResourceEventInMessage'
 
-  resourceEventOut:
+  ResourceEventOut:
     address: "service/resourceOut"
     messages:
       resourceEventOut:
-        $ref: '#/components/messages/resourceEventOutMessage'
+        $ref: '#/components/messages/ResourceEventOutMessage'
 
 operations:
   resourceEventIn:
     action: "receive"
     channel:
-      $ref: "#/channels/resourceEventIn"
+      $ref: "#/channels/ResourceEventIn"
 
   resourceEventOut:
     action: "send"
     channel:
-      $ref: '#/channels/resourceEventOut'
+      $ref: '#/channels/ResourceEventOut'
 
 
 components:
   messages:
-    resourceEventInMessage:
+    ResourceEventInMessage:
       headers:
         $ref: '#/components/schemas/MessageHeader'
       payload:
         $ref: '#/components/schemas/ResourceIn'
 
-    resourceEventOutMessage:
+    ResourceEventOutMessage:
       headers:
         $ref: '#/components/schemas/MessageHeader'
       payload:

@@ -1,12 +1,3 @@
----
-title: Blueprint
-navigation:
-  - section: Introduction
-  - document: ./README.md
-    label: Introduction
-  - document: ../02 Constraints/README.md
-    label: Constraints
----
 # Introduction and Scope
 
 > **Note:**

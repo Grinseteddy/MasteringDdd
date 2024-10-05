@@ -1,6 +1,6 @@
 asyncapi: 3.0.0
 info:
-  title: Catalog Manamement
+  title: Catalog Management
   version: 1.0.0
   description: |
     Asynchronous APIs for Catalog Management

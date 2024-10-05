@@ -1,3 +1,12 @@
+---
+title: Blueprint
+navigation:
+  - section: Introduction
+  - document: ./README.md
+    label: Introduction
+  - document: ../02 Constraints/README.md
+    label: Constraints
+---
 # Introduction and Scope
 
 > **Note:**
@@ -36,7 +45,8 @@ The quality requirements can be documented in a table.
 
 ## Stakeholders
 
-> **Note:**
+> **Note:
+> **
 > Stakeholders can be listed in a table.
 > As stakeholders, the key partners and customers of the business model canvas should appear.
 > Additionally, sponsors of the product or project can be listed.

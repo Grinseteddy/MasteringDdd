@@ -8,12 +8,12 @@ skinparam ranksep 20
 
 skinparam component {
     bordercolor grey
-    fontcolor #777777
+    fontcolor black
 }
 
 skinparam actor {
     bordercolor grey
-    fontcolor #777777
+    fontcolor black
 }
 
 skinparam class {
@@ -23,25 +23,27 @@ skinparam class {
     backgroundcolor<<Value Object>> #EEEEEE
 
     bordercolor grey
-    fontcolor grey
-    fontcolor<<Aggregate>> grey
-    fontcolor<<Entity>> grey
-    fontcolor<<Value Object>> grey
+    fontcolor black
+    fontcolor<<Aggregate>> black
+    fontcolor<<Entity>> black
+    fontcolor<<Value Object>> black
 
-    attributefontcolor grey
-    attributefontsize 12
+    attributefontcolor black
+    attributefontsize 14
     attributefontcolor<<Aggregate>> grey
 
-    stereotypefontcolor grey
-    stereotypefontsize 8
+    methodfontsize 12
+
+    stereotypefontcolor black
+    stereotypefontsize 14
 
 
 }
 
 skinparam arrow {
-    color grey
-    fontcolor grey
-    fontsize 10
+    color black
+    fontcolor black
+    fontsize 12
 }
 
 skinparam queue {
@@ -51,17 +53,17 @@ skinparam queue {
     backgroundcolor<<Value Object>> #EEEEEE
 
     bordercolor grey
-    fontcolor grey
-    fontcolor<<Aggregate>> grey
-    fontcolor<<Entity>> grey
-    fontcolor<<Value Object>> grey
+    fontcolor black
+    fontcolor<<Aggregate>> black
+    fontcolor<<Entity>> black
+    fontcolor<<Value Object>> black
 
     attributefontcolor grey
     attributefontsize 12
     attributefontcolor<<Aggregate>> grey
 
     stereotypefontcolor grey
-    stereotypefontsize 8
+    stereotypefontsize 12
 
 
 }
@@ -73,17 +75,17 @@ skinparam database {
     backgroundcolor<<Value Object>> #EEEEEE
 
     bordercolor grey
-    fontcolor grey
-    fontcolor<<Aggregate>> grey
-    fontcolor<<Entity>> grey
-    fontcolor<<Value Object>> grey
+    fontcolor black
+    fontcolor<<Aggregate>> black
+    fontcolor<<Entity>> black
+    fontcolor<<Value Object>> black
 
     attributefontcolor grey
     attributefontsize 12
     attributefontcolor<<Aggregate>> grey
 
     stereotypefontcolor grey
-    stereotypefontsize 8
+    stereotypefontsize 12
 
 
 }

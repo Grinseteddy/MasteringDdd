@@ -13,38 +13,38 @@ skinparam class {
     backgroundcolor<<Value Object>> #EEEEEE
 
     bordercolor grey
-    fontcolor grey
-    fontcolor<<Aggregate>> grey
-    fontcolor<<Entity>> grey
-    fontcolor<<Value Object>> grey
+    fontcolor black
+    fontcolor<<Aggregate>> black
+    fontcolor<<Entity>> black
+    fontcolor<<Value Object>> black
 
-    attributefontcolor grey
+    attributefontcolor black
     attributefontsize 12
-    attributefontcolor<<Aggregate>> grey
+    attributefontcolor<<Aggregate>> black
 
-    stereotypefontcolor grey
+    stereotypefontcolor black
     stereotypefontsize 8
 
 
 }
 
 skinparam arrow {
-    color grey
-    fontcolor grey
+    color black
+    fontcolor black
     fontsize 10
 }
 
 skinparam storage {
     backgroundcolor white
-    bordercolor grey
+    bordercolor black
     borderstyle dashed
-    fontcolor grey
+    fontcolor black
 
 }
 
 skinparam note {
     backgroundcolor white
-    fontcolor grey
+    fontcolor black
     fontstyle italic
     fontsize 10
     bordercolor grey
@@ -55,7 +55,7 @@ skinparam note {
 port {
   LineColor grey
   BackgroundColor #BBBBBB
-  fontcolor grey
+  fontcolor black
   fontsize 12
   fontstyle italic
 }

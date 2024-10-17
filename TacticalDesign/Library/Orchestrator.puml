@@ -3,13 +3,15 @@
 
 autonumber
 skinparam arrow {
-    fontcolor grey
+    fontcolor black
     color grey
+    fontsize 14
 }
 
 skinparam participant {
     backgroundcolor white
-    fontcolor grey
+    fontcolor black
+    fontsize 14
     bordercolor grey
 
     fontcolor<<Orchestrator>> black
@@ -17,7 +19,8 @@ skinparam participant {
 
 skinparam actor {
     backgroundcolor grey
-    fontcolor grey
+    fontcolor black
+    fontsize 14
     bordercolor grey
 }
 
@@ -27,12 +30,14 @@ sequenceDiagram {
     FontStyle italic
     LineThickness 1
     LineColor grey
+    fontsize 14
   }
   groupHeader {
     FontStyle italic
-    FontColor grey
+    FontColor black
     BackGroundColor white
     LineColor grey
+    fontsize 14
   }
 }
 </style>

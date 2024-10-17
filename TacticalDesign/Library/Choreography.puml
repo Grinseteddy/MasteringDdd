@@ -4,27 +4,31 @@
 autonumber
 autonumber
 skinparam arrow {
-    fontcolor grey
+    fontcolor black
     color grey
+    fontsize 14
 }
 
 skinparam participant {
     backgroundcolor white
-    fontcolor grey
+    fontcolor black
     bordercolor grey
+    fontsize 14
 }
 
 skinparam queue {
     backgroundcolor white
-    fontcolor grey
+    fontcolor black
     bordercolor grey
     fontcolor<<Choreography>> black
+    fontsize 14
 }
 
 skinparam actor {
     backgroundcolor grey
-    fontcolor grey
+    fontcolor black
     bordercolor grey
+    fontsize 14
 }
 
 <style>
@@ -33,12 +37,15 @@ sequenceDiagram {
     FontStyle italic
     LineThickness 1
     LineColor grey
+    fontcolor black
+    fontsize 14
   }
   groupHeader {
     FontStyle italic
-    FontColor grey
+    FontColor black
     BackGroundColor white
     LineColor grey
+    fontsize 14
   }
 }
 </style>
@@ -46,15 +53,15 @@ sequenceDiagram {
 actor Member as member
 
 box Client
-    participant "Search MFE" as searchUi
-    participant "Lending MFE" as lendingUi
-    participant "Reading MFE" as readingUi
-    participant "Bookshelf MFE" as bookshelfUi
-    queue "Portal Framework" as portalQueue <<Choreography>>
+    participant "Search\nMFE" as searchUi
+    participant "Lending\nMFE" as lendingUi
+    participant "Reading\nMFE" as readingUi
+    participant "Bookshelf\nMFE" as bookshelfUi
+    queue "Portal\nFramework" as portalQueue <<Choreography>>
 
 
 box Library
-    participant "Catalog Search" as searchComponent
+    participant "Catalog\nSearch" as searchComponent
     participant "Lending" as lendingComponent
     participant "Reading" as readingComponent
     participant "Bookshelf" as bookshelfComponent

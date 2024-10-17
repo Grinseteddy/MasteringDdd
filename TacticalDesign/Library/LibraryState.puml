@@ -8,20 +8,21 @@ allowmixing
 skinparam state {
     backgroundcolor #E5e5e5
 
-    fontcolor grey
+    fontcolor black
+    fontsize 10
 }
 
 skinparam arrow {
-    fontcolor grey
-    fontsize 8
-    color grey
+    fontcolor black
+    fontsize 10
+    color black
 }
 
 skinparam rectangle {
     backgroundcolor white
     bordercolor grey
     borderstyle dashed
-    fontcolor grey
+    fontcolor black
 }
 
 rectangle Purchase {

@@ -6,13 +6,13 @@ skinparam linetype ortho
 skinparam state {
     backgroundcolor #E5e5e5
 
-    fontcolor grey
+    fontcolor black
 }
 
 skinparam arrow {
-    fontcolor grey
+    fontcolor black
     fontsize 8
-    color grey
+    color black
 }
 
 scale 350 width

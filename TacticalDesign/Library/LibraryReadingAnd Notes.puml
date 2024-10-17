@@ -1,6 +1,9 @@
 @startuml
 'https://plantuml.com/class-diagram
 
+@startuml
+'https://plantuml.com/class-diagram
+
 'left to right direction
 top to bottom direction
 hide empty members
@@ -52,49 +55,6 @@ skinparam note {
 
 }
 
-storage "Catalog Management" as catalogBoundedContext  {
-    class "Catalog" as catalog <<(A,#FFFFFF) Aggregate>> {
-        id: uuid
-        catalogEntries: array of CatalogEntry
-        + search(SearchCriteria: searchCriteria)
-        + update(CatalogEntry: newEntry)
-    }
-
-    class "CatalogEntry" as catalogEntry <<A, #FFFFFF>> {
-        * id: uuid
-        * title : string
-        * authors : array of string
-        blurb: string
-        thumbnail: image
-        * editor: Editor
-        * year: string
-        * status: Status
-    }
-
-    class "Editor" as editor <<(V, #FFFFFF) Value Object>> {
-        * name: string
-        * city: string
-        country: string
-        address: Address
-    }
-
-    class "Address" as address <<V, #FFFFFF) Value Object>> {
-        * street: string
-        * city: string
-        * postCode: string
-    }
-
-    enum "Status" as statusCatalogEntry <<(N,#FFFFFF)>> {
-        CREATED
-        STORED
-        PUBLISHED
-    }
-
-    catalog *-"1..*" catalogEntry
-    catalogEntry *-"1" editor
-    editor *-"0..1" address
-    catalogEntry *--"1" statusCatalogEntry
-}
 
 storage Notes {
     class "IndividualNote" as individualNote <<(A, #FFFFFF) Aggregate>> {
@@ -153,29 +113,11 @@ storage Reading {
 
 }
 
-storage Lending {
-    class "LendingEntry" as lendingEntry <<(A, #FFFFFF) Aggregate>>{
-        * bookLent: uuid
-        * member: uuid
-        + lendBook(book: uuid, member: uuid)
-        + returnBook(catalogEntry: uuid, catalog: uuid, member: uuid)
-    }
 
-    enum "Status" as statusLending <<(N, #FFFFFF)>> {
-        LENT
-        RETURNED
-    }
-
-    lendingEntry *-"1" statusLending
-}
 
 individualNote ..> bookRead : use
-bookRead ..> lendingEntry : use
-lendingEntry ..> catalogEntry : use
-lendingEntry ..> catalog : use
-lendingEntry ..> bookShelf : use
 
-' Layout
-Reading -down-> Lending
+
+@enduml
 
 @enduml

@@ -12,13 +12,13 @@ skinparam class {
 
     bordercolor grey
     fontcolor grey
-    fontcolor<<Aggregate>> grey
-    fontcolor<<Entity>> grey
-    fontcolor<<Value Object>> grey
+    fontcolor<<Aggregate>> black
+    fontcolor<<Entity>> black
+    fontcolor<<Value Object>> black
 
-    attributefontcolor grey
+    attributefontcolor black
     attributefontsize 12
-    attributefontcolor<<Aggregate>> grey
+    attributefontcolor<<Aggregate>> black
 
     stereotypefontcolor grey
     stereotypefontsize 8

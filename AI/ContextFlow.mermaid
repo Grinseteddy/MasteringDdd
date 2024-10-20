@@ -1,0 +1,9 @@
+graph TD
+    A[User Context] -->|Creates task| B[Inbox Context]
+    B -->|Tasks reviewed| C[Team Review Context]
+    C -->|Tasks assigned| D[Task Assignment Context]
+    D -->|Task assigned| E[Individual Task Context]
+    E -->|Set to in progress| F[Task Progress Context]
+    F -->|Add documents and notes| G[Task Documentation Context]
+    G -->|Task finished| H[Task Completion Context]
+    H -->|Create follow-up task| B

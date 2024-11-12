@@ -60,7 +60,7 @@ storage "Catalog Management" as catalogBoundedContext  {
         + update(CatalogEntry: newEntry)
     }
 
-    class "CatalogEntry" as catalogEntry <<A, #FFFFFF>> {
+    class "CatalogEntry" as catalogEntry <<(A, #FFFFFF) Aggregate>> {
         * id: uuid
         * title : string
         * authors : array of string

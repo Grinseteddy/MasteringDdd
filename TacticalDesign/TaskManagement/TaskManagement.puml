@@ -53,7 +53,7 @@ enum "Status" as status <<(N, #FFFFFF)>> {
     NEW
     ASSIGNED
     IN_PROGRESS
-    REJECTED
+    DECLINED
     DONE
 }
 

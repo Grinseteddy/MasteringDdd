@@ -21,7 +21,7 @@ scale 350 width
 NEW --> ASSIGNED : Assign task
 
 ASSIGNED --> IN_PROGRESS : Work on task
-ASSIGNED --> REJECTED : Work on task
+ASSIGNED --> DECLINED : Work on task
 
 IN_PROGRESS --> DONE : Finish task
 
